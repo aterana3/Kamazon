@@ -5,8 +5,8 @@
         </button>
         <ul class="hidden md:flex items-center space-x-6">
             <li><a href="{% url 'home' %}" class="hover:text-gray-300">Inicio</a></li>
-            <li><a href="#" class="hover:text-gray-300">Categorías</a></li>
-            <li><a href="#" class="hover:text-gray-300">Productos</a></li>
+            <li><a href="{% url 'products:producto_list' %}" class="hover:text-gray-300">Categorías</a></li>
+            <li><a href="{% url 'products:producto_list' %}" class="hover:text-gray-300">Productos</a></li>
         </ul>
     </div>
     <ul class="flex items-center space-x-6 text-white">
@@ -28,6 +28,7 @@
                             <ul>
                                 <li><a href="{% url 'settings:profile' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Configurar</a></li>
                                 <li><a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Historial</a></li>
+                                <li><a href="{% url 'products:producto_create' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Gestionar Compras</a></li>
                                 <li><a href="{% url 'authentication:logout' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Cerrar sesión</a></li>
                             </ul>
                         </div>
