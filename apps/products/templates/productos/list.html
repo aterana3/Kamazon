@@ -1,0 +1,64 @@
+{% extends "index.html" %}
+
+{% block content %}
+    <div class="container mx-auto my-8">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-primary">Lista de Productos</h1>
+            {% block search %}
+                <form action="" class="flex space-x-2" style="max-width: 450px;">
+                    <input type="text" class="form-input border border-gray-300 rounded-md shadow-sm px-4 py-2" placeholder="Buscar por nombre" name="q1" value="{{ request.GET.q1 }}">
+                    <button class="btn btn-outline-danger px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md" data-bs-toggle="tooltip" data-bs-title="Escriba parte del nombre y click en buscar">
+                        Buscar
+                    </button>
+                </form>
+            {% endblock search %}
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead class="bg-gray-100">
+                    {% block columns %}
+                    <tr>
+                        <th class="text-left py-2 px-4 border-b border-gray-200 text-gray-600">Nombre del Producto</th>
+                        <th class="text-left py-2 px-4 border-b border-gray-200 text-gray-600">Descripción</th>
+                        <th class="text-left py-2 px-4 border-b border-gray-200 text-gray-600">Precio</th>
+                        <th class="text-left py-2 px-4 border-b border-gray-200 text-gray-600">Stock</th>
+                        <th class="text-left py-2 px-4 border-b border-gray-200 text-gray-600">Categoría</th>
+                        <th class="text-center py-2 px-4 border-b border-gray-200 text-gray-600">Acciones</th>
+                    </tr>
+                    {% endblock columns %}
+                </thead>
+                <tbody>
+                    {% block rows %}
+                    {% for producto in productos %}
+                    <tr class="hover:bg-gray-100">
+                        <td class="py-2 px-4 border-b border-gray-200">{{ producto.name|upper }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ producto.description }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ producto.precio }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ producto.stock }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ producto.categoria }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200 text-center">
+                            <a class="text-green-600 hover:text-green-800 mx-2" href="{% url 'products:producto_update' producto.id %}" data-bs-toggle="tooltip" data-bs-title="Editar el producto">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a class="text-red-600 hover:text-red-800 mx-2" href="{% url 'products:producto_delete' producto.id %}" data-bs-toggle="tooltip" data-bs-title="Eliminar el producto">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-4 px-4 text-center text-red-600 font-bold">
+                            <div class="py-2 mt-2 border border-red-600 shadow rounded">
+                                ¡No se encontraron datos que cumplan los criterios de búsqueda...!
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endblock rows %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
+
