@@ -1,0 +1,40 @@
+{% extends "settings_layout.html" %}
+{% block settings_content %}
+<div class="mb-4 grid grid-cols-2 gap-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700">First Name</label>
+        <div class="mt-1">
+            <p class="text-sm text-gray-500">{{ user.first_name }}</p>
+        </div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Last Name</label>
+        <div class="mt-1">
+            <p class="text-sm text-gray-500">{{ user.last_name }}</p>
+        </div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Phone</label>
+        <div class="mt-1">
+            <p class="text-sm text-gray-500">{{ user.phone }}</p>
+        </div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Direction</label>
+        <div class="mt-1">
+            <p class="text-sm text-gray-500">{{ user.direction }}</p>
+        </div>
+    </div>
+</div>
+<div class="mb-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Email</label>
+        <div class="mt-1">
+            <p class="text-sm text-gray-500">{{ user.email }}</p>
+        </div>
+    </div>
+</div>
+<div class="mb-4 text-right">
+    <a href="{% url 'settings:profile_update' %}" class="text-sm text-primary hover:text-primary-light">Edit</a>
+</div>
+{% endblock %}

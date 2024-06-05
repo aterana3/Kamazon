@@ -1,0 +1,61 @@
+{% load static %}
+<div class="bg-base-alt">
+    <div class="container py-24 mx-auto">
+        <div class="flex justify-between mb-8">
+            <h2 class="text-3xl font-bold mb-8 slide-in-bottom-h1 text-primary">Productos recién agregados</h2>
+            <button class="text-primary">Ver todas</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <img src="{% static 'img/products_added/imagen 1.jpg' %}" alt="Imagen 1"
+                    class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <div class="flex justify-center">
+                        <h3 class="text-primary font-bold mb-2">Producto 1</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg">
+                <img src="{% static 'img/products_added/imagen 2.jpg' %}" alt="Imagen 2"
+                    class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <div class="flex justify-center">
+                        <h3 class="text-primary font-bold mb-2">Producto 2</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg">
+                <img src="{% static 'img/products_added/imagen 3.jpg' %}" alt="Imagen 3"
+                    class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <div class="flex justify-center">
+                        <h3 class="text-primary font-bold mb-2">Producto 3</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg">
+                <img src="{% static 'img/products_added/imagen 4.jpg' %}" alt="Imagen 4"
+                    class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <div class="flex justify-center">
+                        <h3 class="text-primary font-bold mb-2">Producto 4</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg">
+                <img src="{% static 'img/products_added/imagen 5.jpg' %}" alt="Imagen 5"
+                    class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <div class="flex justify-center">
+                        <h3 class="text-primary font-bold mb-2">Producto 5</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

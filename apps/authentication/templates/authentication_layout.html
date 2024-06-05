@@ -1,0 +1,12 @@
+{% extends "base_layout.html" %}
+
+{% block layout %}
+<section class="bg-white p-8 rounded shadow-md w-96">
+    <h2 class="text-2xl text-center font-bold mb-6">{{title}}</h2>
+        {% block content %}
+        {% endblock content %}
+        <footer class="text-sm mt-4">
+            {% block footer %} {% endblock %}
+        </footer>
+</section>
+{% endblock layout %}

@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block content %}
+    <main class="bg-base">
+        <!-- Hero start -->
+        {% include "home/components/hero.html" %}
+        <!-- Hero end -->
+
+        <!-- Recommended start -->
+        {% include "home/components/recommended.html" %}
+        <!-- Recommended end -->
+
+        <!-- Search bar -->
+        {% include "home/components/search_bar.html" %}
+        <!-- Search bar end -->
+
+        <!-- Categories -->
+        {% include "home/components/categories.html" %}
+        <!-- Categories end -->
+
+        <!-- Products recent added -->
+        {% include "home/components/recent_added.html" %}
+        <!-- Products recent added end -->
+
+        <!-- Contact area -->
+        {% include "home/components/contact_area.html" %}
+        <!-- Contact area end -->
+    </main>
+{% endblock %}

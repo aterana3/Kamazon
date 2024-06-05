@@ -1,0 +1,17 @@
+{% extends "authentication_layout.html" %}
+
+{% block layout %}
+<main class="bg-primary">
+    <div class="flex justify-center items-center min-h-screen">
+        {{block.super}}
+    </div>
+</main>
+{% endblock layout %}
+
+{% block content %}
+    {% include "register/form.html" %}
+{% endblock content %}
+
+{% block footer %}
+    <p>¿Ya estás registrado? <a href="{% url 'authentication:login' %}" class="text-primary">Inicia sesión</a></p>
+{% endblock footer %}

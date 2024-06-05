@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+
+{% block content %}
+<main class="bg-base min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row">
+            <div class="w-full md:w-1/4 bg-white shadow p-4 mb-4 md:mb-0">
+                <header class="flex flex-col mb-4 items-center">
+                    <img class="rounded-full mb-2" src="{{user.get_avatar}}" alt="user" width="100" height="100">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">{{user.username}}</p>
+                        <h2 class="text-lg font-semibold">{{user.get_full_name}}</h2>
+                    </div>
+                </header>
+                {% include "components/nav.html" %}
+            </div>
+            <div class="w-full md:w-3/4 ml-0 md:ml-4 bg-white shadow p-4">
+                <header class="border-b-2 mb-4">
+                    <h2 class="text-lg font-semibold my-2">{{title}}</h2>
+                </header>
+                {% block settings_content %}
+                {% endblock settings_content %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}
