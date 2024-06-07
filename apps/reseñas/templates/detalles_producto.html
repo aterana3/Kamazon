@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Reseña</title>
+    {% load static %}
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <div class="max-w-2xl mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-6 text-center">{{ title }}</h1>
+        <form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded shadow-md">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="titulo">Título</label>
+                {{ form.título|as_crispy_field }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="contenido">Contenido</label>
+                {{ form.contenido|as_crispy_field }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="valoracion">Valoración</label>
+                {{ form.valoración|as_crispy_field }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="autor">Autor</label>
+                {{ form.autor|as_crispy_field }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="imagen">Imagen</label>
+                {{ form.imagen|as_crispy_field }}
+            </div>
+            <div class="text-center">
+                <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded">Guardar</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
+
