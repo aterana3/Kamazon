@@ -10,8 +10,8 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = 'Category'
-        verbose_name_plural = "Category's"
-        ordering = ['-name']
+        verbose_name_plural = "Categories"
+        db_table = 'categories'
 
 class Product(models.Model):
     name = models.CharField(verbose_name='Name', max_length=50, unique=True)
@@ -24,6 +24,6 @@ class Product(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'product'
-        verbose_name_plural = 'products'
-        ordering = ['-name']
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
+        db_table = 'products'
