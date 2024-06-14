@@ -10,7 +10,8 @@ urlpatterns = [
     path('devices/send_message/', device.sendMessageDevice.as_view(), name='device_send_message'),
 
     path('profile/', user.UserDetailView.as_view(), name='profile'),
-    path('profile/base_form.html/', user.UserUpdateView.as_view(), name='profile_update'),
+    path('profile/update/', user.UserUpdateView.as_view(), name='profile_update'),
 
     path('products/', product.ProductListView.as_view(), name='products'),
+    path('products/create/', product.ProductCreateView.as_view(), name='product_create'),
 ]

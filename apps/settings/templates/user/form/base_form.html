@@ -25,6 +25,8 @@
 {% endblock controls %}
 
 {% block buttons %}
-    {{block.super}}
-    <a href="{% url 'settings:profile' %}" class="bg-gray-300 w-full text-black text-center px-4 py-2 rounded-md">Cancel</a>
+    <div class="flex justify-center gap-2">
+        {{block.super}}
+        <a href="{% url 'settings:profile' %}" class="bg-gray-300 w-full text-black text-center px-4 py-2 rounded-md">Cancel</a>
+    </div>
 {% endblock buttons %}
