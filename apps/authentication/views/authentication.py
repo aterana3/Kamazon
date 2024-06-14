@@ -19,7 +19,7 @@ from django.shortcuts import redirect
 
 class AuthRegisterView(CreateView):
     form_class = RegisterForm
-    template_name = 'register/index.html'
+    template_name = 'register/page.html'
     success_url = reverse_lazy('auth:login')
 
     def get_context_data(self, **kwargs):
@@ -29,7 +29,7 @@ class AuthRegisterView(CreateView):
         return context
     
 class AuthLoginView(LoginView):
-    template_name = 'login/index.html'
+    template_name = 'login/page.html'
     form_class = LoginForm
 
     def form_valid(self, form):

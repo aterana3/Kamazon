@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 class DeviceListView(LoginRequiredMixin, ListView):
     model = Device
-    template_name = 'devices/index.html'
+    template_name = 'devices/list/page.html'
     context_object_name = 'devices'
     paginate_by = 10
 
@@ -40,7 +40,7 @@ class ForceLogoutView(LoginRequiredMixin, View):
         return redirect(reverse_lazy('settings:devices'))
 
 class QRScanView(LoginRequiredMixin, TemplateView):
-    template_name = 'devices/add/index.html'
+    template_name = 'devices/add/page.html'
 
 class sendMessageDevice(LoginRequiredMixin, View):
     @csrf_exempt

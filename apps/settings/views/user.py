@@ -10,7 +10,7 @@ User = get_user_model()
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
-    template_name = 'user/index.html'
+    template_name = 'user/detail/page.html'
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -23,7 +23,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
-    template_name = 'user/update/index.html'
+    template_name = 'user/form/page.html'
     success_url = reverse_lazy('authentication:login')
 
     def get_object(self, queryset=None):

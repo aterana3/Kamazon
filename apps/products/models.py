@@ -1,10 +1,11 @@
+from apps.core.models import ModelBase
 from django.db import models
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 # Create your models here.
-class Category(models.Model):
+class Category(ModelBase):
     name = models.CharField(verbose_name='Name', max_length=50, unique=True)
     description = models.TextField(verbose_name='Description')
 
@@ -16,7 +17,8 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
         db_table = 'categories'
 
-class Product(models.Model):
+
+class Product(ModelBase):
     name = models.CharField(verbose_name='Name', max_length=50, unique=True)
     image = models.ImageField(verbose_name='Image', upload_to='products', null=True, blank=True)
     description = models.TextField(verbose_name="Description")
