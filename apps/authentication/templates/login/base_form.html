@@ -11,6 +11,6 @@
         {% include "components/forms/field.html" with field=form.remember_me %}
     </div>
     <div class="flex justify-center">
-        {% include "components/forms/button.html" %}
+        {% include "components/button.html" with extra_classes="bg-black text-white" button_text=submit_text %}
     </div>
 {% endblock controls %}
