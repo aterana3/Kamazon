@@ -16,6 +16,8 @@
         <div class="mt-4 text-center">
             <button class="bg-primary text-white px-4 py-2 rounded-lg">Cancelar</button>
         </div>
+        <p id="error" class="mt-4 text-center text-red-500 text-sm">
+        </p>
     </div>
 </main>
 
@@ -50,8 +52,8 @@
 
     function sendToken(qrCodeMessage) {
         const jsonString = qrCodeMessage.replace(/'/g, '"');
-        jsonData = JSON.parse(jsonString)
-        fetch("{% url 'settings:device_send_message' %}", {
+        const jsonData = JSON.parse(jsonString)
+        fetch("{% url 'settings:device_authorize' %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,10 +65,11 @@
                 window.location.href = "{% url 'settings:devices' %}";
                 return;
             }
-            console.error('Error al enviar el token');
             start();
         }).catch(error => {
-            console.error('Error de red:', error);
+            const $error = document.getElementById('error');
+            $error.innerText = `Error: ${error.message}`;
+            start();
         });
     }    
 </script>

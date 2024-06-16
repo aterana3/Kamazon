@@ -17,40 +17,33 @@
             const host = `ws://${window.location.host}/ws/qr/${token}/`
 
             const ws = new WebSocket(host);
-
-            ws.onopen = function(event) {
-                console.log('WebSocket connection established.');
-            };
             
             ws.onmessage = function(event) {
                 const data = JSON.parse(event.data);
-                if (data.status === 200) {
-                    const sessionKey = data.session_key;
-                    fetch("{% url 'authentication:qr_login' %}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({session_key: sessionKey, token: token})
-                    }).then(response => {
-                        if (response.ok) {
-                            window.location.href = "{% url 'home' %}";
-                            return
-                        }
-                        console.error('Errror al iniciar sesión');
-                    }).catch(error => {
-                        console.error('Error:', error);
-                    });
-                } else if (data.status === 400) {
+                if(data.status === 400) {
                     console.error('Error:', data.message);
+                    return
                 }
-            };
-            
-            ws.onclose = function(event) {
-                console.log('WebSocket connection closed.');
-            };
+                const sessionKey = data.session_key;
+                fetch("{% url 'authentication:qr_login' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({session_key: sessionKey, token: token})
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = "{% url 'home' %}";
+                        return
+                    }
+                    console.error('Error al iniciar sesión');
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            }
         });
+
     </script>
 {% endblock layout %}
 

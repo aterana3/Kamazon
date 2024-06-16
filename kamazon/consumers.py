@@ -5,7 +5,10 @@ import json
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
 class QRConsumer(AsyncWebsocketConsumer):
+
     async def connect(self):
         self.token = self.scope['url_route']['kwargs']['token']
         await self.channel_layer.group_add(self.token, self.channel_name)
@@ -16,29 +19,26 @@ class QRConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.token, self.channel_name)
         print(f"WebSocket disconnected from group: {self.token}")
 
-    async def receive(self, event):
-        message = event['message']
-        if message == "authorize":
-            user_id = event['user_id']
-            user = await self.get_user(user_id)
-            if not user:
-                await self.send(text_data=json.dumps({
-                    'status': 400,
-                    'success': False,
-                    'message': 'User not found',
-                }))
-                return
-            session_key = await self.create_session(user)
+    async def handle_receive(self, response):
+        user_id = response['user_id']
+        user = await self.get_user(user_id)
+        if not user:
             await self.send(text_data=json.dumps({
-                'status': 200,
-                'success': True,
-                'message': 'Created session key',
-                'session_key': session_key
+                'status': 400,
+                'success': False,
+                'message': 'User not found',
             }))
+            return
+        session_key = await self.create_session(user)
+        await self.send(text_data=json.dumps({
+            'status': 200,
+            'success': True,
+            'message': 'Created session key',
+            'session_key': session_key
+        }))
 
     @database_sync_to_async
     def get_user(self, user_id):
-        User = get_user_model()
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:

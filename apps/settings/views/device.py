@@ -42,32 +42,37 @@ class ForceLogoutView(LoginRequiredMixin, View):
 class QRScanView(LoginRequiredMixin, TemplateView):
     template_name = 'devices/add/page.html'
 
-class sendMessageDevice(LoginRequiredMixin, View):
+class SendMessageDevice(LoginRequiredMixin, View):
     @csrf_exempt
     def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
-            if data:
-                token = data['token']
-                cache_data = cache.get(token)
-                if cache_data is not None:
-                    user_id = request.user.id
-                    cache_data['user_id'] = user_id
-                    cache.set(token, cache_data, timeout=600)
-                    channel_layer = get_channel_layer()
-                    async_to_sync(channel_layer.group_send)(
-                    token,
-                    {
-                        'type': 'receive',
-                        'message': 'authorize',
-                        'user_id': user_id
-                    })
-                    return JsonResponse({'success': True, 'message': 'Message sent'})
-            else:
+
+            if not data:
                 raise KeyError("data is missing")
+
+            token = data['token']
+            cache_data = cache.get(token)
+
+            if cache_data is None:
+                return JsonResponse({'success': False, 'message': 'Invalid token'}, status=400)
+
+            user_id = request.user.id
+            cache_data['user_id'] = user_id
+            cache.set(token, cache_data, timeout=600)
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                token,
+                {
+                    'type': 'handle_receive',
+                    'user_id': user_id
+                }
+            )
+            return JsonResponse({'success': True, 'message': 'Message sent'})
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON: {e}")
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
         except KeyError as e:
             print(f"Error: {e}")
-            return JsonResponse({'success': False, 'message': 'Missing key'}, status=400)
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
