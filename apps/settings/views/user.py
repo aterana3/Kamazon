@@ -4,6 +4,7 @@ from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from apps.settings.forms.user import UserUpdateForm
 from django.urls import reverse_lazy
+from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 
 User = get_user_model()
@@ -24,7 +25,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
     template_name = 'user/form/page.html'
-    success_url = reverse_lazy('authentication:login')
+    success_url = reverse_lazy('settings:profile')
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -32,6 +33,8 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(self.request, "Your profile has been successfully updated.")
+        if 'new_password' in form.cleaned_data and form.cleaned_data['new_password']:
+            update_session_auth_hash(self.request, form.instance)
         return response
 
     def form_invalid(self, form):
