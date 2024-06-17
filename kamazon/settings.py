@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'widget_tweaks',
+    'django_ckeditor_5',
     'apps.core',
     'apps.authentication',
     'apps.settings',
@@ -170,4 +171,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Custom settings
+# CKEditor
+# https://github.com/hvlads/django-ckeditor-5
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'imageUpload'],
+        'language': 'es',
+    },
+}

@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView
 from apps.products.models import Product
-from apps.products.forms.product import ProductForm
+from apps.settings.forms.product import ProductForm
 from django.urls import reverse_lazy
 
 class ProductListView(LoginRequiredMixin, ListView):

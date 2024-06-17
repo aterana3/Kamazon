@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from apps.products.models import Product
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 User = get_user_model()
 
@@ -10,6 +11,11 @@ class ProductForm(forms.ModelForm):
         model = Product
         fields = '__all__'
         exclude = ['user', 'created_at', 'updated_at']
+        widgets = {
+            "description": CKEditor5Widget(
+                attrs={"class": "django_ckeditor_5"}
+            )
+        }
 
     def clean(self):
         cleaned_data = super().clean()

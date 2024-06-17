@@ -1,4 +1,9 @@
 {% extends 'base_index.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'django_ckeditor_5/dist/styles.css' %}">
+{% endblock %}
 
 {% block content %}
     <main class="bg-base min-h-screen">
@@ -6,4 +11,42 @@
             {% include 'products/form/base_form.html' %}
         </div>
     </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'django_ckeditor_5/dist/bundle.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+            const imagePreview = document.getElementById('image-preview');
+
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.src = "{% static 'img/default-product.png' %}";
+                }
+            });
+            window.ClassicEditor
+                .create( document.querySelector( '#id_description'), {
+                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'imageUpload'],
+                    image: {
+                        toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
+                        styles: [
+                            'full',
+                            'alignLeft',
+                            'alignRight'
+                        ]
+                    }
+                })
+                .catch( error => {
+                    console.error( error );
+                });
+        });
+    </script>
 {% endblock %}

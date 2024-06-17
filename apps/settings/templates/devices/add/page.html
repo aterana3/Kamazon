@@ -2,10 +2,6 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block scripts %}
-<script src="{% static "assets/vendor/html5-qrcode/html5-qrcode.min.js" %}"></script>
-{% endblock scripts %}
-
 {% block layout %}
 <main class="bg-primary flex items-center justify-center min-h-screen">
     <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
@@ -20,7 +16,7 @@
         </p>
     </div>
 </main>
-
+<script src="{% static "assets/vendor/html5-qrcode/html5-qrcode.min.js" %}"></script>
 <script>
     const html5QrCode = new Html5Qrcode('video');
 
