@@ -15,7 +15,7 @@
                 {% include 'components/forms/field.html' with field=form.stock %}
             </div>
             <div class="mb-4">
-                {% include 'components/forms/field.html' with field=form.description %}
+                {{ form.description }}
             </div>
         </div>
         <div class="w-full md:w-1/4 bg-white shadow-md p-4">
@@ -25,12 +25,12 @@
 
             <div class="mb-4">
                 <div class="flex justify-center items-center">
-                    <img id="image-preview" src="{% static  'img/default-product.png' %}" alt="Image Preview" class="border border-black rounded-md w-32 h-32 mb-4">
+                    <img id="image-preview" src="{% static  'img/default-product.png' %}" alt="Image Preview" class="border border-gray-500 rounded-md w-32 h-32 mb-4">
                 </div>
                 {% include 'components/forms/field.html' with field=form.image %}
             </div>
             <div class="mb-4">
-                {% include 'components/forms/field.html' with field=form.category %}
+                {% include 'components/forms/field.html' with field=form.categories %}
             </div>
         </div>
     </div>

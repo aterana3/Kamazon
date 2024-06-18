@@ -2,23 +2,36 @@
 {% load static %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'django_ckeditor_5/dist/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/choices/choices.min.css' %}">
+    {{ form.media }}
 {% endblock %}
 
 {% block content %}
     <main class="bg-base min-h-screen">
         <div class="container mx-auto px-4 py-8">
+            <div class="mb-4">
+                <a href="{% url 'settings:products' %}" class="text-primary hover:text-primary-dark">
+                    <i class="fas fa-arrow-left"></i> Back to products
+                </a>
+            </div>
             {% include 'products/form/base_form.html' %}
         </div>
     </main>
 {% endblock %}
 
+
 {% block scripts %}
-    <script src="{% static 'django_ckeditor_5/dist/bundle.js' %}"></script>
+
+    <script src="{% static 'libs/choices/choices.min.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const imageInput = document.getElementById('{{ form.image.id_for_label }}');
             const imagePreview = document.getElementById('image-preview');
+            const existingImageUrl = '{{ form.image.value.url}}';
+
+            if (existingImageUrl) {
+                imagePreview.src = existingImageUrl;
+            }
 
             imageInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -32,21 +45,20 @@
                     imagePreview.src = "{% static 'img/default-product.png' %}";
                 }
             });
-            window.ClassicEditor
-                .create( document.querySelector( '#id_description'), {
-                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'imageUpload'],
-                    image: {
-                        toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
-                        styles: [
-                            'full',
-                            'alignLeft',
-                            'alignRight'
-                        ]
-                    }
-                })
-                .catch( error => {
-                    console.error( error );
-                });
+
+            const categories = document.getElementById('{{ form.categories.id_for_label }}');
+
+            const select = new Choices(categories, {
+                removeItemButton: true,
+                searchEnabled: true,
+                searchChoices: true,
+                placeholder: true,
+                placeholderValue: 'Select a category',
+                noResultsText: 'No results found',
+                itemSelectText: 'Press to select',
+                maxItemCount: 5,
+                renderChoiceLimit: 5
+            });
         });
     </script>
 {% endblock %}

@@ -7,13 +7,18 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 User = get_user_model()
 
 class ProductForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["description"].required = False
+
     class Meta:
         model = Product
         fields = '__all__'
         exclude = ['user', 'created_at', 'updated_at']
         widgets = {
             "description": CKEditor5Widget(
-                attrs={"class": "django_ckeditor_5"}
+                attrs={"class": "django_ckeditor_5"}, config_name="extends"
             )
         }
 
