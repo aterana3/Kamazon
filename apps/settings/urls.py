@@ -6,7 +6,7 @@ app_name = 'settings'
 urlpatterns = [
     path('devices/', device.DeviceListView.as_view(), name='devices'),
     path('devices/<int:device_id>/close_session/', device.ForceLogoutView.as_view(), name='device_close_session'),
-    path('devices/add/', device.QRScanView.as_view(), name='device_add'),
+    path('devices/scan/', device.QRScanView.as_view(), name='device_scan'),
     path('devices/authorize/', device.SendMessageDevice.as_view(), name='device_authorize'),
 
     path('profile/', user.UserDetailView.as_view(), name='profile'),

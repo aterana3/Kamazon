@@ -40,7 +40,7 @@ class ForceLogoutView(LoginRequiredMixin, View):
         return redirect(reverse_lazy('settings:devices'))
 
 class QRScanView(LoginRequiredMixin, TemplateView):
-    template_name = 'devices/add/page.html'
+    template_name = 'devices/scan/page.html'
 
 class SendMessageDevice(LoginRequiredMixin, View):
     @csrf_exempt
