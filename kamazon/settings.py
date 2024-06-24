@@ -158,6 +158,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+TRAINING_ROOT = os.path.join(BASE_DIR, 'training')
+
+TEMP_ROOT = os.path.join(BASE_DIR, 'temp')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

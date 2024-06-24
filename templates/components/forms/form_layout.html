@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 
 {% block form %}
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="form-container">
         {% csrf_token %}
         {% block controls %}
         {% endblock controls %}

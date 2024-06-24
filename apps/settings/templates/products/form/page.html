@@ -3,6 +3,7 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'libs/choices/choices.min.css' %}">
+    <script src="{% static 'libs/opencv/opencv.js' %}"></script>
     {{ form.media }}
 {% endblock %}
 
@@ -17,48 +18,22 @@
             {% include 'products/form/base_form.html' %}
         </div>
     </main>
+    <dialog id="capture" class="p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-lg font-semibold mb-4">Presiona la tecla 'c' para capturar.</h2>
+        <canvas id="canvas" width="640" height="480" class="border border-gray-300 rounded mb-4"></canvas>
+        {% include 'components/button.html' with id="close-dialog" extra_classes="bg-red-500 text-white" button_text="Cerrar" %}
+    </dialog>
 {% endblock %}
 
-
 {% block scripts %}
-
     <script src="{% static 'libs/choices/choices.min.js' %}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.getElementById('{{ form.image.id_for_label }}');
-            const imagePreview = document.getElementById('image-preview');
-            const existingImageUrl = '{{ form.image.value.url}}';
-
-            if (existingImageUrl) {
-                imagePreview.src = existingImageUrl;
-            }
-
-            imageInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imagePreview.src = e.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                } else {
-                    imagePreview.src = "{% static 'img/default-product.png' %}";
-                }
-            });
-
-            const categories = document.getElementById('{{ form.categories.id_for_label }}');
-
-            const select = new Choices(categories, {
-                removeItemButton: true,
-                searchEnabled: true,
-                searchChoices: true,
-                placeholder: true,
-                placeholderValue: 'Select a category',
-                noResultsText: 'No results found',
-                itemSelectText: 'Press to select',
-                maxItemCount: 5,
-                renderChoiceLimit: 5
-            });
-        });
+        const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+        const existingImageUrl = '{{ form.image.value.url}}';
+        const imageDefault = "{% static 'img/default-product.png' %}"
+        const categories = document.getElementById('{{ form.categories.id_for_label }}');
+        const product_id = {{ form.instance.id }};
     </script>
+    <script src="{% static 'js/product-form.js' %}"></script>
+    <script src="{% static 'js/product-capture.js' %}"></script>
 {% endblock %}
