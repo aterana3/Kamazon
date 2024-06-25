@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apps.core.views import home
+from apps.core.views import home, training
 from django.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -28,4 +28,5 @@ urlpatterns = [
     path('settings/', include('apps.settings.urls')),
     path('products/', include('apps.products.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls'), name='ck_editor_5_upload_file'),
+    path("training/<str:pk>", training.ExecuteTraining.as_view(), name='training'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

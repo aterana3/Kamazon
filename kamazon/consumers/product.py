@@ -1,7 +1,6 @@
 import json
 import os
 import uuid
-import tempfile
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -41,7 +40,8 @@ class ProductConsumer(AsyncWebsocketConsumer):
         product_id = data.get('id_product')
 
         temp_dir = os.path.join(settings.TEMP_ROOT, str(product_id))
-        os.makedirs(temp_dir, exist_ok=True)
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
 
         temp_file_path = os.path.join(temp_dir, filename)
 
@@ -52,8 +52,9 @@ class ProductConsumer(AsyncWebsocketConsumer):
 
     async def save_images(self, data):
         product_id = data.get('id_product')
-        training_dir = f'{settings.TRAINING_ROOT}/product/{product_id}'
-        os.makedirs(training_dir, exist_ok=True)
+        dataset_dir = f'{settings.DATASET_ROOT}/{product_id}'
+        if not os.path.exists(dataset_dir):
+            os.makedirs(dataset_dir)
 
         temp_dir = os.path.join(settings.TEMP_ROOT, str(product_id))
 
@@ -65,10 +66,9 @@ class ProductConsumer(AsyncWebsocketConsumer):
                 image_data = f.read()
 
             file_name = f"{uuid.uuid4()}.jpg"
-            file_path = os.path.join(training_dir, file_name)
+            file_path = os.path.join(dataset_dir, file_name)
             with open(file_path, 'wb') as f:
                 f.write(image_data)
 
             os.remove(temp_dir)
-
         await self.send(text_data=json.dumps({'message': 'Images saved successfully.'}))

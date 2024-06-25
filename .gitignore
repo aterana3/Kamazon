@@ -70,4 +70,6 @@ Pipfile.lock
 .env.*
 
 # Training
-training/*
+dataset/*
+temp/*
+

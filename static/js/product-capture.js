@@ -81,15 +81,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    function stopCamera() {
-        if (video && video.srcObject) {
-            let stream = video.srcObject;
-            let tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
-            video.srcObject = null;
-        }
-    }
-
     function dataURLtoBlob(dataURL) {
         let arr = dataURL.split(',');
         let mime = arr[0].match(/:(.*?);/)[1];
@@ -113,13 +104,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function closeWebSocket() {
-        if (webSocket) {
-            webSocket.close();
-        }
-    }
-
-
     function sendImage(filename, blob) {
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
             const reader = new FileReader();
@@ -130,10 +114,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     action: 'temp',
                     id_product: product_id,
                     filename: filename,
-                    image: Array.from(imageBytes)
+                    image: Array.from(imageBytes),
                 });
                 webSocket.send(data);
             };
+        }
+    }
+
+    function stopCamera() {
+        if (video && video.srcObject) {
+            let stream = video.srcObject;
+            let tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    }
+
+    function closeWebSocket() {
+        if (webSocket) {
+            webSocket.close();
         }
     }
 
