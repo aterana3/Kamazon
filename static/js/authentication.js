@@ -1,5 +1,9 @@
 window.addEventListener('DOMContentLoaded', (event) => {
     const webSocket = new WebSocket(`ws://${window.location.host}/ws/qr/${token}/`);
+    webSocket.onopen = () => {
+        console.log('WebSocket is open now.');
+    }
+
     webSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         const action = data.action;
