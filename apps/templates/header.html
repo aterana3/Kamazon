@@ -1,0 +1,71 @@
+<header class="bg-primary text-white py-4 px-6 flex justify-between items-center">
+    <div class="flex items-center space-x-6">
+        <button id="mobile-menu-button" class="md:hidden hover:text-gray-300">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+        <ul class="hidden md:flex items-center space-x-6">
+            <li><a href="{% url 'home' %}" class="hover:text-gray-300">Inicio</a></li>
+            <li><a href="" class="hover:text-gray-300">Categorías</a></li>
+            <li><a href="" class="hover:text-gray-300">Productos</a></li>
+        </ul>
+    </div>
+    <ul class="flex items-center space-x-6 text-white">
+        <li>
+            <a href="#" class="hover:text-gray-300">
+                <i class="fa-solid fa-magnifying-glass text-xl"></i>
+            </a>
+        </li>
+        <li>
+            {% if user.is_authenticated %}
+                <div class="flex items-center gap-2">
+                    <details class="relative">
+                        <summary class="flex items-center gap-2 cursor-pointer list-none">
+                            <img class="rounded-full w-9 h-9" src="{{user.get_avatar}}" alt="user">
+                            <p>Hi, {{user.username}}</p>
+                            <i class="fa-solid fa-caret-down text-sm"></i> 
+                        </summary>
+                        <div class="absolute right-0 mt-4 w-48 bg-white border border-gray-200 shadow-md rounded-md">
+                            <ul>
+                                <li><a href="{% url 'settings:profile' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Configurar</a></li>
+                                <li><a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Historial</a></li>
+                                <li><a href="{% url 'authentication:logout' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Cerrar sesión</a></li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            {% else %}
+                <a href="{% url 'authentication:login' %}" class="hover:text-gray-300">
+                    <i class="fa-regular fa-user text-xl"></i>
+                </a>
+            {% endif %}
+        </li>
+        <li>
+            <a href="#" class="hover:text-gray-300">
+                <i class="fa-regular fa-cart-shopping text-xl"></i>
+            </a>
+        </li>
+    </ul>
+    <!-- Menú móvil -->
+    <div id="mobile-menu" class="md:hidden fixed inset-0 bg-primary bg-opacity-90 z-50 flex flex-col items-center justify-center space-y-6 hidden">
+        <a href="{% url 'home' %}" class="hover:text-gray-300 text-xl">Inicio</a>
+        <a href="#" class="hover:text-gray-300 text-xl">Categorías</a>
+        <a href="#" class="hover:text-gray-300 text-xl">Productos</a>
+        <button id="close-mobile-menu" class="absolute top-4 right-4 text-white">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+    </div>
+</header>
+
+<script>
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeMobileMenu = document.getElementById('close-mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    closeMobileMenu.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+    });
+</script>

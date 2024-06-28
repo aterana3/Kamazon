@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+    <script src="{% static '/libs/tailwind/core.js' %}"></script>
+    <script src="{% static '/libs/tailwind/config.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/brands.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/light.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/regular.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/solid.min.css' %}">
+    {% block styles %}
+    {% endblock styles %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    {% block layout %}
+    {% endblock layout %}
+    {% block scripts %}
+    {% endblock scripts %}
+</body>
+</html>

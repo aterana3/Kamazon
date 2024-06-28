@@ -41,11 +41,12 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'widget_tweaks',
+    'django_ckeditor_5',
     'apps.core',
     'apps.authentication',
     'apps.settings',
     'apps.products',
-    'django_ckeditor_5',
+    'apps.shopping_cart',
 ]
 
 MIDDLEWARE = [
@@ -147,6 +148,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Temp files
+
+TEMP_ROOT = os.path.join(BASE_DIR, 'temp')
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -157,6 +162,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# IA Files(Models, Dataset)
+
+DATASET_ROOT = os.path.join(BASE_DIR, 'dataset')
+
+MODELS_ROOT = os.path.join(BASE_DIR, 'models')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

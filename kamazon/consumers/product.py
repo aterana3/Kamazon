@@ -4,9 +4,16 @@ import uuid
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+class ProductTrainingConsumer(AsyncWebsocketConsumer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.token = None
+        self.room_group_name = None
 
     async def connect(self):
         self.token = self.scope['url_route']['kwargs']['token']
+        self.room_group_name = f'{self.token}'
 
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -70,3 +77,38 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
             os.remove(temp_dir)
         await self.send(text_data=json.dumps({'message': 'Images saved successfully.'}))
+
+
+class ProductDetectorConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = None
+        self.room_group_name = None
+
+    async def connect(self):
+        self.name = self.scope['url_route']['kwargs']['name']
+
+        self.room_group_name = f'cart_{self.name}'
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+        print(f"WebSocket connected to user: {self.name}")
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        print(f"WebSocket disconnected from user: {self.name}")
+
+    async def receive(self, text_data=None, bytes_data=None):
+        if bytes_data:
+            try:
+                pass
+            except Exception as e:
+                print(f'Error al procesar la imagen: {e}')
