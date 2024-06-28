@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
 class QRConsumer(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
@@ -32,8 +31,11 @@ class QRConsumer(AsyncWebsocketConsumer):
             action = data.get('action')
             if action == 'authorize':
                 await self.authorize(data)
-            elif action == '':
-                pass
+            elif action == 'authenticated':
+                await self.channel_layer.group_send(self.room_group_name, {
+                    'type': 'authenticated',
+                    'data': data
+                })
 
     async def authorize(self, data):
         user = await self.get_user(data['user_id'])

@@ -57,6 +57,7 @@
         }
         webSocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             if (data.action === 'authenticated') {
                 window.location.href = "{% url 'settings:devices' %}";
             }
