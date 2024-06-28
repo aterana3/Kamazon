@@ -1,10 +1,29 @@
 import qrcode
 from io import BytesIO
 import base64
+import geoip2.database
+import os
+from django.conf import settings
 
 def get_city_from_ip(ip_address):
-    return 'Unknown'
+    print("exc")
+    reader = None
+    try:
+        reader = geoip2.database.Reader(settings.GEOCITY_PATH)
+        response = reader.city(ip_address)
+        city = response.city.name
+        return city if city else 'Unknown'
+    except geoip2.errors.AddressNotFoundError:
+        return 'Unknown'
+    except Exception as e:
+        print(f"Error getting city from IP: {e}")
+        return 'Unknown'
+    finally:
+        print("finish")
+        if reader:
+            reader.close()
 
+    
 def generate_qrcode(data):
     qr_code_stream = BytesIO()
 

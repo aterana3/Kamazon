@@ -4,11 +4,9 @@ import uuid
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-class ProductConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.token = self.scope['url_route']['kwargs']['token']
-        self.room_group_name = f'product_{self.token}'
 
         await self.channel_layer.group_add(
             self.room_group_name,

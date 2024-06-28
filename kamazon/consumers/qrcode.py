@@ -7,11 +7,18 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class QRConsumer(AsyncWebsocketConsumer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.token = None
+        self.room_group_name = None
 
     async def connect(self):
         self.token = self.scope['url_route']['kwargs']['token']
-        await self.channel_layer.group_add(self.token, self.channel_name)
+        self.room_group_name = f'{self.token}'
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
         print(f"WebSocket connected to group: {self.token}")
 
@@ -19,23 +26,28 @@ class QRConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.token, self.channel_name)
         print(f"WebSocket disconnected from group: {self.token}")
 
-    async def handle_receive(self, response):
-        user_id = response['user_id']
-        user = await self.get_user(user_id)
-        if not user:
+    async def receive(self, text_data=None, bytes_data=None):
+        if text_data:
+            data = json.loads(text_data)
+            action = data.get('action')
+            if action == 'authorize':
+                await self.authorize(data)
+            elif action == '':
+                pass
+
+    async def authorize(self, data):
+        user = await self.get_user(data['user_id'])
+        if user:
+            session_key = await self.create_session(user)
             await self.send(text_data=json.dumps({
-                'status': 400,
-                'success': False,
-                'message': 'User not found',
+                'action': 'successful',
+                'session_key': session_key
             }))
-            return
-        session_key = await self.create_session(user)
-        await self.send(text_data=json.dumps({
-            'status': 200,
-            'success': True,
-            'message': 'Created session key',
-            'session_key': session_key
-        }))
+        else:
+            await self.send(text_data=json.dumps({
+                'action': 'error',
+                'error': 'User not found'
+            }))
 
     @database_sync_to_async
     def get_user(self, user_id):

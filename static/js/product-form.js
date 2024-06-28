@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 imagePreview.src = e.target.result;
             }
             reader.readAsDataURL(file);
-        } else {
-            imagePreview.src = imageDefault;
         }
     });
 

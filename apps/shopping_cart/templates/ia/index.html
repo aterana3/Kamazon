@@ -1,0 +1,24 @@
+{% extends 'base_layout.html' %}
+{% load static %}
+
+{% block layout %}
+    <main class="bg-primary">
+        <h1 class="text-3xl text-white font-bold p-4">Shopping Cart</h1>
+        <button id="start" class="bg-white text-primary font-bold py-2 px-4 rounded">Start</button>
+        <canvas id="canvas" width="640" height="480" class="border border-gray-300 rounded mb-4"></canvas>
+        <table>
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">Name</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </main>
+    <script>
+        const user_id = "{{ user.id }}";
+    </script>
+    <script src="{% static "js/shopping-capture.js" %}"></script>
+{% endblock layout %}

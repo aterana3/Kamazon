@@ -27,6 +27,7 @@ urlpatterns = [
     path('auth/', include('apps.authentication.urls')),
     path('settings/', include('apps.settings.urls')),
     path('products/', include('apps.products.urls')),
+    path('shopping-cart/', include('apps.shopping_cart.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls'), name='ck_editor_5_upload_file'),
     path("training/<str:pk>", training.ExecuteTraining.as_view(), name='training'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

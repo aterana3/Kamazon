@@ -18,6 +18,9 @@
 </main>
 <script src="{% static "assets/vendor/html5-qrcode/html5-qrcode.min.js" %}"></script>
 <script>
+    const user_id = "{{ user.id }}";
+</script>
+<script>
     const html5QrCode = new Html5Qrcode('video');
 
     function start() {
@@ -29,7 +32,7 @@
             },
             qrCodeMessage => {
                 html5QrCode.stop();
-                sendToken(qrCodeMessage);
+                sendAuthorization(qrCodeMessage);
             },
             errorMessage => {
                 console.error(errorMessage);
@@ -46,27 +49,15 @@
         window.location.href = "{% url 'settings:devices' %}";
     });
 
-    function sendToken(qrCodeMessage) {
-        const jsonString = qrCodeMessage.replace(/'/g, '"');
-        const jsonData = JSON.parse(jsonString)
-        fetch("{% url 'settings:device_authorize' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify(jsonData)
-        }).then(response => {
-            if (response.ok) {
+    function sendAuthorization(token) {
+        const webSocket = new WebSocket(`ws://${window.location.host}/ws/qr/${token}/`);
+        webSocket.send(JSON.stringify({ user_id: user_id, 'action': 'authorize' }));
+        webSocket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === 'authenticated') {
                 window.location.href = "{% url 'settings:devices' %}";
-                return;
             }
-            start();
-        }).catch(error => {
-            const $error = document.getElementById('error');
-            $error.innerText = `Error: ${error.message}`;
-            start();
-        });
+        };
     }    
 </script>
 {% endblock layout %}
