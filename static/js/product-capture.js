@@ -5,11 +5,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const capture_dialog = document.getElementById('capture');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
-    const roiWidth = 200;
-    const roiHeight = 200;
     let imageCount = 0;
     let video;
     let webSocket;
+    let isSettingROI = false;
+    let roiCoordinates = { x: 0, y: 0, width: 0, height: 0 };
 
     btn_open.addEventListener('click', function () {
         capture_dialog.showModal();
@@ -39,17 +39,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     canvas.height = height;
 
                     function drawFrame() {
-                        if (capture_dialog.open) {
-                            context.drawImage(video, 0, 0, width, height);
-                            let x1 = width / 2 - roiWidth / 2;
-                            let y1 = height / 2 - roiHeight / 2;
-
+                        context.drawImage(video, 0, 0, width, height);
+                        if (isSettingROI) {
                             context.strokeStyle = 'green';
                             context.lineWidth = 2;
-                            context.strokeRect(x1, y1, roiWidth, roiHeight);
-
-                            requestAnimationFrame(drawFrame);
+                            context.strokeRect(roiCoordinates.x, roiCoordinates.y, roiCoordinates.width, roiCoordinates.height);
                         }
+                        requestAnimationFrame(drawFrame);
                     }
 
                     drawFrame();
@@ -57,23 +53,58 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.addEventListener('keydown', function (event) {
                         if (!capture_dialog.open) return;
                         if (event.key === "c") {
-                            let roiCanvas = document.createElement('canvas');
-                            roiCanvas.width = roiWidth;
-                            roiCanvas.height = roiHeight;
-                            let roiContext = roiCanvas.getContext('2d');
-
-                            let x1 = width / 2 - roiWidth / 2;
-                            let y1 = height / 2 - roiHeight / 2;
-                            roiContext.drawImage(video, x1, y1, roiWidth, roiHeight, 0, 0, roiWidth, roiHeight);
-
-                            let imgURL = roiCanvas.toDataURL('image/jpeg');
-                            let filename = `image_${imageCount}.jpg`;
-                            let blob = dataURLtoBlob(imgURL);
-
-                            sendImage(filename, blob);
-                            imageCount++;
+                            if (!isSettingROI) {
+                                isSettingROI = true;
+                                pauseVideo();
+                            } else {
+                                isSettingROI = false;
+                                captureAndSendImage();
+                                resumeVideo();
+                            }
                         }
                     });
+
+                    canvas.addEventListener('mousedown', function (event) {
+                        if (isSettingROI) {
+                            roiCoordinates.x = event.offsetX;
+                            roiCoordinates.y = event.offsetY;
+                            roiCoordinates.width = 0;
+                            roiCoordinates.height = 0;
+                            canvas.addEventListener('mousemove', setROI);
+                            canvas.addEventListener('mouseup', endSetROI);
+                        }
+                    });
+
+                    function setROI(event) {
+                        roiCoordinates.width = event.offsetX - roiCoordinates.x;
+                        roiCoordinates.height = event.offsetY - roiCoordinates.y;
+                    }
+
+                    function endSetROI() {
+                        canvas.removeEventListener('mousemove', setROI);
+                        canvas.removeEventListener('mouseup', endSetROI);
+                    }
+
+                    function pauseVideo() {
+                        video.pause();
+                    }
+
+                    function resumeVideo() {
+                        video.play();
+                    }
+
+                    function captureAndSendImage() {
+                        // Capturing the original image from the video
+                        context.drawImage(video, 0, 0, width, height);
+
+                        let imgURL = canvas.toDataURL('image/jpeg');
+                        let filename = `image_${imageCount}.jpg`;
+                        let blob = dataURLtoBlob(imgURL);
+
+                        // Sending image and ROI data
+                        sendImage(filename, blob, roiCoordinates);
+                        imageCount++;
+                    }
                 });
             }).catch(function (error) {
                 console.log("Error: No se puede acceder a la cámara");
@@ -98,13 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 
     function startWebSocket() {
-        webSocket = new WebSocket(`ws://${window.location.host}/ws/product/${token}/`);
+        webSocket = new WebSocket(`ws://${window.location.host}/ws/product/training/${token}/`);
         webSocket.onopen = function (event) {
             console.log('WebSocket is open now.');
         };
     }
 
-    function sendImage(filename, blob) {
+    function sendImage(filename, blob, roiData) {
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
             const reader = new FileReader();
             reader.readAsArrayBuffer(blob);
@@ -115,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     id_product: product_id,
                     filename: filename,
                     image: Array.from(imageBytes),
+                    roi: roiData  // Sending ROI data along with the image
                 });
                 webSocket.send(data);
             };
@@ -141,5 +173,11 @@ document.addEventListener('DOMContentLoaded', function () {
             startWebSocket();
         }
         webSocket.send(JSON.stringify({ action: 'save', id_product: product_id }));
+    });
+
+    // Ensure cleanup on page unload
+    window.addEventListener('unload', function () {
+        stopCamera();
+        closeWebSocket();
     });
 });
