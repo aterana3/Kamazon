@@ -7,25 +7,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     webSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        const action = data.action;
-        if (action === 'successful') {
+        if (data.type === 'successful') {
             const sessionKey = data.session_key;
-            fetch("{% url 'authentication:qr_login' %}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': `${token}`
-                    },
-                    body: JSON.stringify({session_key: sessionKey})
+            fetch(loginQR, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': `${token}`
+                },
+                body: JSON.stringify({session_key: sessionKey})
             }).then(response => {
                 if (response.ok) {
-                    webSocket.send(JSON.stringify({action: 'authenticated'}));
-                    return
+                    webSocket.send(JSON.stringify({type: 'authenticated'}));
+                    window.location.href = redirectURL;
+                } else {
+                    console.error(response.statusText);
                 }
-                console.error(response.message);
             }).catch(error => {
                 console.error('Error:', error);
             });
         }
-    }
+    };
 });

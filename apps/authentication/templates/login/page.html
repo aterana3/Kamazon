@@ -16,6 +16,8 @@
     <script>
         //Initialize variables
         const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        const loginQR = "{% url 'authentication:qr_login' %}"
+        const redirectURL = "{% url '' %}"
     </script>
     <script>
         QRCode.toDataURL(`${token}`, function (error, url) {

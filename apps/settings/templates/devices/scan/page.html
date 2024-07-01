@@ -53,15 +53,17 @@
         const webSocket = new WebSocket(`ws://${window.location.host}/ws/qr/${token}/`);
         webSocket.onopen = () => {
             console.log('WebSocket is open now.');
-            webSocket.send(JSON.stringify({ user_id: user_id, 'action': 'authorize' }));
+            webSocket.send(JSON.stringify({
+                'type': 'user_id',
+                'user_id': user_id
+            }));
         }
         webSocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log(data);
-            if (data.action === 'authenticated') {
+            if (data.type === 'authenticated') {
                 window.location.href = "{% url 'settings:devices' %}";
             }
         };
-    }    
+    }
 </script>
 {% endblock layout %}

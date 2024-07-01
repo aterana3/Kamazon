@@ -1,9 +1,9 @@
 from django.contrib.sessions.backends.db import SessionStore
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-import json
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import get_user_model
+import json
 
 User = get_user_model()
 
@@ -25,32 +25,6 @@ class QRConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.token, self.channel_name)
         print(f"WebSocket disconnected from group: {self.token}")
 
-    async def receive(self, text_data=None, bytes_data=None):
-        if text_data:
-            data = json.loads(text_data)
-            action = data.get('action')
-            if action == 'authorize':
-                await self.authorize(data)
-            elif action == 'authenticated':
-                await self.channel_layer.group_send(self.room_group_name, {
-                    'type': 'authenticated',
-                    'data': data
-                })
-
-    async def authorize(self, data):
-        user = await self.get_user(data['user_id'])
-        if user:
-            session_key = await self.create_session(user)
-            await self.send(text_data=json.dumps({
-                'action': 'successful',
-                'session_key': session_key
-            }))
-        else:
-            await self.send(text_data=json.dumps({
-                'action': 'error',
-                'error': 'User not found'
-            }))
-
     @database_sync_to_async
     def get_user(self, user_id):
         try:
@@ -65,3 +39,45 @@ class QRConsumer(AsyncWebsocketConsumer):
         session[BACKEND_SESSION_KEY] = 'django.contrib.auth.backends.ModelBackend'
         session.save()
         return session.session_key
+
+    async def receive(self, text_data=None, bytes_data=None):
+        text_data_json = json.loads(text_data)
+        message_type = text_data_json['type']
+
+        if message_type == 'user_id':
+            user_id = text_data_json['user_id']
+            user = await self.get_user(user_id)
+            if user:
+                session_key = await self.create_session(user)
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'send_session_key',
+                        'session_key': session_key
+                    }
+                )
+
+        elif message_type == 'authenticated':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_authentication',
+                    'message': 'authenticated'
+                }
+            )
+
+    async def send_session_key(self, event):
+        session_key = event['session_key']
+
+        await self.send(text_data=json.dumps({
+            'type': 'successful',
+            'session_key': session_key
+        }))
+
+    async def send_authentication(self, event):
+        message = event['message']
+
+        await self.send(text_data=json.dumps({
+            'type': 'authenticated',
+            'message': message
+        }))
