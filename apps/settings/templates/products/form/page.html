@@ -34,6 +34,7 @@
     {% endif %}
     const categories = document.getElementById('{{ form.categories.id_for_label }}');
     const product_id = {{ form.instance.id }};
+    const product_name = "{{ form.instance.name }}";
     </script>
     <script src="{% static 'libs/choices/choices.min.js' %}"></script>
     <script src="{% static 'js/product-form.js' %}"></script>

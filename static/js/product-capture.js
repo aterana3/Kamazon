@@ -143,10 +143,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const imageBytes = new Uint8Array(reader.result);
                 const data = JSON.stringify({
                     action: 'temp',
+                    name_product: product_name,
                     id_product: product_id,
                     filename: filename,
                     image: Array.from(imageBytes),
-                    roi: roiData  // Sending ROI data along with the image
+                    roi: roiData
                 });
                 webSocket.send(data);
             };

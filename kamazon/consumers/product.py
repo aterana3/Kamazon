@@ -4,6 +4,7 @@ from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 import xml.etree.ElementTree as ET
 from PIL import Image
+from kamazon.detection.detection import detect_objects, load_model, load_class_labels
 
 
 class ProductTrainingConsumer(AsyncWebsocketConsumer):
@@ -57,7 +58,7 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
             f.write(bytes(image_data))
 
         roi = data.get('roi')
-        self.generate_xml(product_id, filename, roi)
+        self.generate_xml(product_id, filename, roi, class_label)
         await self.send(text_data=json.dumps({'message': f'Temporary image {filename} saved.'}))
 
     async def save(self, data):
@@ -81,7 +82,7 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
             os.remove(temp_file_path)
         await self.send(text_data=json.dumps({'message': 'Images saved successfully.'}))
 
-    def generate_xml(self, product_id, filename, roi):
+    def generate_xml(self, product_id, filename, roi, class_label):
         image_path = os.path.join(settings.TEMP_ROOT, str(product_id), filename)
         image = Image.open(image_path)
         image_width, image_height = image.size
@@ -96,7 +97,7 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
         ET.SubElement(size_elem, "height").text = str(image_height)
 
         roi_elem = ET.SubElement(root, "object")
-        ET.SubElement(roi_elem, "name").text = str(product_id)
+        ET.SubElement(roi_elem, "name").text = class_label
         ET.SubElement(roi_elem, "pose").text = "Unspecified"
         ET.SubElement(roi_elem, "truncated").text = "0"
         ET.SubElement(roi_elem, "difficult").text = "0"
@@ -144,6 +145,9 @@ class ProductDetectorConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         if bytes_data:
             try:
-                pass
+                model = load_model()
+                class_labels = load_class_labels()
+                label, bbox = detect_objects(bytes_data, model, class_labels)
+                await self.send(text_data=json.dumps({'label': label, 'bbox': bbox}))
             except Exception as e:
                 print(f'Error al procesar la imagen: {e}')

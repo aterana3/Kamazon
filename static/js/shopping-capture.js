@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function startWebSocket() {
-        webSocket = new WebSocket(`ws://${window.location.host}/ws/detect/cart-${user_id}/`);
+        webSocket = new WebSocket(`ws://${window.location.host}/ws/product/detect/cart-${user_id}/`);
         webSocket.onopen = function () {
             console.log('WebSocket is open now.');
         };

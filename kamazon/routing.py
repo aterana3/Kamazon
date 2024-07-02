@@ -6,5 +6,5 @@ from kamazon.consumers.product import ProductTrainingConsumer, ProductDetectorCo
 websocket_urlpatterns = [
     path("ws/qr/<str:token>/", QRConsumer.as_asgi()),
     path("ws/product/training/<str:token>/", ProductTrainingConsumer.as_asgi()),
-    path("ws/product/detect/<int:user_id>/", ProductDetectorConsumer.as_asgi()),
+    path("ws/product/detect/<str:name>/", ProductDetectorConsumer.as_asgi()),
 ]
