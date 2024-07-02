@@ -2,10 +2,11 @@ import json
 import os
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
-import xml.etree.ElementTree as ET
-from PIL import Image
-from kamazon.detection.detection import detect_objects, load_model, load_class_labels
-
+from PIL import Image as PILImage
+from io import BytesIO
+from kamazon.detection.detection import is_image_dark
+from kamazon.detectionv2 import detect_objects
+import numpy as np
 
 class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
@@ -46,7 +47,6 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
         filename = data.get('filename')
         image_data = data.get('image')
         product_id = data.get('id_product')
-        class_label = data.get('name_product')
 
         # Save image
         temp_dir = os.path.join(settings.TEMP_ROOT, str(product_id))
@@ -57,8 +57,6 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
         with open(temp_file_path, 'wb') as f:
             f.write(bytes(image_data))
 
-        roi = data.get('roi')
-        self.generate_xml(product_id, filename, roi, class_label)
         await self.send(text_data=json.dumps({'message': f'Temporary image {filename} saved.'}))
 
     async def save(self, data):
@@ -82,38 +80,6 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
             os.remove(temp_file_path)
         await self.send(text_data=json.dumps({'message': 'Images saved successfully.'}))
 
-    def generate_xml(self, product_id, filename, roi, class_label):
-        image_path = os.path.join(settings.TEMP_ROOT, str(product_id), filename)
-        image = Image.open(image_path)
-        image_width, image_height = image.size
-
-        root = ET.Element("annotation")
-
-        filename_elem = ET.SubElement(root, "filename")
-        filename_elem.text = filename
-
-        size_elem = ET.SubElement(root, "size")
-        ET.SubElement(size_elem, "width").text = str(image_width)
-        ET.SubElement(size_elem, "height").text = str(image_height)
-
-        roi_elem = ET.SubElement(root, "object")
-        ET.SubElement(roi_elem, "name").text = class_label
-        ET.SubElement(roi_elem, "pose").text = "Unspecified"
-        ET.SubElement(roi_elem, "truncated").text = "0"
-        ET.SubElement(roi_elem, "difficult").text = "0"
-
-        bndbox_elem = ET.SubElement(roi_elem, "bndbox")
-        ET.SubElement(bndbox_elem, "xmin").text = str(roi['x'])
-        ET.SubElement(bndbox_elem, "ymin").text = str(roi['y'])
-        ET.SubElement(bndbox_elem, "xmax").text = str(roi['x'] + roi['width'])
-        ET.SubElement(bndbox_elem, "ymax").text = str(roi['y'] + roi['height'])
-
-        xml_string = ET.tostring(root).decode('utf-8')
-        xml_filename = os.path.splitext(filename)[0] + '.xml'
-        xml_file_path = os.path.join(settings.TEMP_ROOT, str(product_id), xml_filename)
-
-        with open(xml_file_path, 'w') as f:
-            f.write(xml_string)
 
 class ProductDetectorConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -145,9 +111,14 @@ class ProductDetectorConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         if bytes_data:
             try:
-                model = load_model()
-                class_labels = load_class_labels()
-                label, bbox = detect_objects(bytes_data, model, class_labels)
-                await self.send(text_data=json.dumps({'label': label, 'bbox': bbox}))
+                image_bytes = bytes_data
+                image = PILImage.open(BytesIO(image_bytes))
+                image = np.array(image)
+                label = ""
+                if is_image_dark(image):
+                    label = "La imagen está oscura."
+                else:
+                    predict = detect_objects(image)
+                    print(predict)
             except Exception as e:
                 print(f'Error al procesar la imagen: {e}')
