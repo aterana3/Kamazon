@@ -1,12 +1,12 @@
+from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import os
-from django.conf import settings
-from channels.generic.websocket import AsyncWebsocketConsumer
 from PIL import Image as PILImage
 from io import BytesIO
-from kamazon.detection.detection import is_image_dark
-from kamazon.detectionv2 import detect_objects
 import numpy as np
+from django.conf import settings
+import uuid
+from kamazon.ia.detection import is_dark_image, detect_product
 
 class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
@@ -36,6 +36,7 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
+
         action = data.get('action')
 
         if action == 'temp':
@@ -44,9 +45,12 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
             await self.save(data)
 
     async def save_temporary(self, data):
-        filename = data.get('filename')
-        image_data = data.get('image')
         product_id = data.get('id_product')
+        image_data = data.get('image')
+        filename = str(uuid.uuid4()) + '.jpg'
+
+        img = PILImage.open(BytesIO(bytes(image_data)))
+        img = img.resize((settings.IMG_WIDTH, settings.IMG_HEIGHT))
 
         # Save image
         temp_dir = os.path.join(settings.TEMP_ROOT, str(product_id))
@@ -54,8 +58,8 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
             os.makedirs(temp_dir)
 
         temp_file_path = os.path.join(temp_dir, filename)
-        with open(temp_file_path, 'wb') as f:
-            f.write(bytes(image_data))
+
+        img.save(temp_file_path, 'JPEG')
 
         await self.send(text_data=json.dumps({'message': f'Temporary image {filename} saved.'}))
 
@@ -79,7 +83,6 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
             os.remove(temp_file_path)
         await self.send(text_data=json.dumps({'message': 'Images saved successfully.'}))
-
 
 class ProductDetectorConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -114,11 +117,19 @@ class ProductDetectorConsumer(AsyncWebsocketConsumer):
                 image_bytes = bytes_data
                 image = PILImage.open(BytesIO(image_bytes))
                 image = np.array(image)
-                label = ""
-                if is_image_dark(image):
-                    label = "La imagen está oscura."
+                if is_dark_image(image):
+                    await self.send(text_data=json.dumps({'error': 'La imagen es muy oscura.'}))
+                    return
+                class_name, confidence = detect_product(image)
+                if class_name:
+                    await self.send(
+                        text_data=json.dumps({
+                            'class_name': class_name,
+                            'confidence': confidence
+                        })
+                    )
                 else:
-                    predict = detect_objects(image)
-                    print(predict)
+                    await self.send(text_data=json.dumps({'error': 'Producto no reconocido o confianza baja.'}))
             except Exception as e:
                 print(f'Error al procesar la imagen: {e}')
+                await self.send(text_data=json.dumps({'error': 'Error al procesar la imagen.'}))

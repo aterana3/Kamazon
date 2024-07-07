@@ -163,11 +163,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# IA Files(Models, Dataset)
+# ia Files(Models, Dataset)
 
 DATASET_ROOT = os.path.join(BASE_DIR, 'dataset')
 
 MODELS_ROOT = os.path.join(BASE_DIR, 'models')
+
+# ia Settings
+IMG_WIDTH = 224
+IMG_HEIGHT = 224
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

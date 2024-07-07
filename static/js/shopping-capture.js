@@ -4,15 +4,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let btn_start = document.getElementById('start');
     let video;
     let webSocket;
-    let intervalId; // Variable para almacenar el ID del intervalo
+    let intervalId;
 
     btn_start.addEventListener('click', function () {
-        startWebSocket(); // Iniciar WebSocket cuando se hace clic en el botón
+        startWebSocket();
         startCamera();
     });
 
     function startCamera() {
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({video: true})
             .then(stream => {
                 video = document.createElement('video');
                 video.srcObject = stream;
@@ -27,14 +27,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         context.drawImage(video, 0, 0, width, height);
                         requestAnimationFrame(drawFrame);
                     }
+
                     drawFrame();
 
-                    // Configurar el envío de imagen cada 30 segundos
                     intervalId = setInterval(function () {
                         let dataURL = canvas.toDataURL('image/jpeg', 0.8);
                         let blob = dataURLtoBlob(dataURL);
                         sendImage(blob);
-                    }, 3000); // Intervalo de 30 segundos (30000 milisegundos)
+                    }, 3000);
                 });
             });
     }
@@ -50,10 +50,12 @@ document.addEventListener('DOMContentLoaded', function () {
             u8arr[n] = bstr.charCodeAt(n);
         }
 
-        return new Blob([u8arr], { type: mime });
+        return new Blob([u8arr], {type: mime});
     }
 
     function startWebSocket() {
+        const productTable = document.getElementById('product-table');
+
         webSocket = new WebSocket(`ws://${window.location.host}/ws/product/detect/cart-${user_id}/`);
         webSocket.onopen = function () {
             console.log('WebSocket is open now.');
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         webSocket.onmessage = function (event) {
             const data = JSON.parse(event.data);
-            console.log(data);
+            console.log(data)
         };
     }
 

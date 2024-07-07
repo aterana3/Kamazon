@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('form-container');
+    const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     const btn_open = document.getElementById('open-dialog');
     const btn_close = document.getElementById('close-dialog');
     const capture_dialog = document.getElementById('capture');
@@ -9,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let video;
     let webSocket;
     let isSettingROI = false;
-    let roiCoordinates = { x: 0, y: 0, width: 0, height: 0 };
+    let roiCoordinates = {x: 0, y: 0, width: 0, height: 0};
 
     btn_open.addEventListener('click', function () {
         capture_dialog.showModal();
@@ -27,7 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function startCamera() {
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({video: {
+            width: { min: 640, ideal: 1280, max: 1920 },
+            height: { min: 480, ideal: 720, max: 1080 }
+        }})
             .then(stream => {
                 video = document.createElement('video');
                 video.srcObject = stream;
@@ -94,22 +98,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     function captureAndSendImage() {
-                        // Capturing the original image from the video
-                        context.drawImage(video, 0, 0, width, height);
+                        context.drawImage(video, roiCoordinates.x, roiCoordinates.y, roiCoordinates.width, roiCoordinates.height, 0, 0, canvas.width, canvas.height);
 
                         let imgURL = canvas.toDataURL('image/jpeg');
-                        let filename = `image_${imageCount}.jpg`;
                         let blob = dataURLtoBlob(imgURL);
 
-                        // Sending image and ROI data
-                        sendImage(filename, blob, roiCoordinates);
+                        sendImage(blob);
                         imageCount++;
                     }
                 });
             }).catch(function (error) {
-                console.log("Error: No se puede acceder a la cámara");
-                console.error(error);
-            });
+            console.log("Error: No se puede acceder a la cámara");
+            console.error(error);
+        });
     }
 
     function dataURLtoBlob(dataURL) {
@@ -123,10 +124,8 @@ document.addEventListener('DOMContentLoaded', function () {
             u8arr[n] = bstr.charCodeAt(n);
         }
 
-        return new Blob([u8arr], { type: mime });
+        return new Blob([u8arr], {type: mime});
     }
-
-    const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 
     function startWebSocket() {
         webSocket = new WebSocket(`ws://${window.location.host}/ws/product/training/${token}/`);
@@ -135,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function sendImage(filename, blob, roiData) {
+    function sendImage(blob) {
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
             const reader = new FileReader();
             reader.readAsArrayBuffer(blob);
@@ -143,11 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const imageBytes = new Uint8Array(reader.result);
                 const data = JSON.stringify({
                     action: 'temp',
-                    name_product: product_name,
                     id_product: product_id,
-                    filename: filename,
                     image: Array.from(imageBytes),
-                    roi: roiData
                 });
                 webSocket.send(data);
             };
@@ -173,10 +169,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (webSocket && webSocket.readyState === WebSocket.CLOSED) {
             startWebSocket();
         }
-        webSocket.send(JSON.stringify({ action: 'save', id_product: product_id }));
+        webSocket.send(JSON.stringify({action: 'save', id_product: product_id}));
     });
 
-    // Ensure cleanup on page unload
     window.addEventListener('unload', function () {
         stopCamera();
         closeWebSocket();
