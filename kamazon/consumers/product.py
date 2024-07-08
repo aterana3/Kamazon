@@ -47,6 +47,7 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
     async def save_temporary(self, data):
         product_id = data.get('id_product')
         image_data = data.get('image')
+        roiCoords = data.get('roi')
         filename = str(uuid.uuid4()) + '.jpg'
 
         img = PILImage.open(BytesIO(bytes(image_data)))
@@ -60,6 +61,8 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
         temp_file_path = os.path.join(temp_dir, filename)
 
         img.save(temp_file_path, 'JPEG')
+
+        json_annotation_file = os.path.join(temp_dir, 'annotations.json')
 
         await self.send(text_data=json.dumps({'message': f'Temporary image {filename} saved.'}))
 

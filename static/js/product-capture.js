@@ -98,12 +98,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     function captureAndSendImage() {
-                        context.drawImage(video, roiCoordinates.x, roiCoordinates.y, roiCoordinates.width, roiCoordinates.height, 0, 0, canvas.width, canvas.height);
+                        context.drawImage(video, 0, 0, width, height);
 
                         let imgURL = canvas.toDataURL('image/jpeg');
                         let blob = dataURLtoBlob(imgURL);
 
-                        sendImage(blob);
+                        sendImage(blob, roiCoordinates);
                         imageCount++;
                     }
                 });
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function sendImage(blob) {
+    function sendImage(blob, roiCoordinates) {
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
             const reader = new FileReader();
             reader.readAsArrayBuffer(blob);
@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     action: 'temp',
                     id_product: product_id,
                     image: Array.from(imageBytes),
+                    roi: roiCoordinates
                 });
                 webSocket.send(data);
             };
