@@ -1,0 +1,30 @@
+{% extends 'components/table_layout.html' %}
+
+{% block header %}
+    <tr class="bg-primary text-white">
+        <th class="px-4 py-2 text-right">Fecha</th>
+        <th class="px-4 py-2 text-right">Impuesto</th>
+        <th class="px-4 py-2 text-right">Subtotal</th>
+        <th class="px-4 py-2 text-right">Total</th>
+        <th class="px-4 py-2 text-right">Acciones</th>
+    </tr>
+{% endblock header %}
+
+{% block rows %}
+    {% for item in invoice.items %}
+        <tr>
+            <td class="px-4 py-2 text-right">{{ item.date }}</td>
+            <td class="px-4 py-2 text-right">${{ item.price|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">${{ item.tax|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">${{ item.subtotal|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">${{ item.total|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">
+                <a href="{% url 'products:invoice_update' item.id %}" class="text-primary">Edit</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td class="px-4 py-2" colspan="6">No items found</td>
+        </tr>
+    {% endfor %}
+{% endblock rows %}

@@ -1,0 +1,21 @@
+{% extends 'base_index.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'libs/choices/choices.min.css' %}">
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <main class="bg-base min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-4">
+                <a href="{% url 'settings:factura' %}" class="text-primary hover:text-primary-dark">
+                    <i class="fas fa-arrow-left"></i> Back to invoices
+                </a>
+            </div>
+            {% include 'invoice/form/base_form.html' %}
+        </div>
+    </main>
+{% endblock %}
+

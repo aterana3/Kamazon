@@ -136,11 +136,8 @@ class ProductDetectorConsumer(AsyncWebsocketConsumer):
                 if is_dark_image(image):
                     await self.send(text_data=json.dumps({'error': 'La imagen es muy oscura.'}))
                     return
-                annotations = detect_products(image)
-                if annotations is None:
-                    await self.send(text_data=json.dumps({'error': 'Error al procesar la imagen.'}))
-                    return
-                await self.send(text_data=json.dumps({'annotations': annotations}))
+                detections = detect_products(image)
+                await self.send(text_data=json.dumps(detections))
             except Exception as e:
                 print(f'Error al procesar la imagen: {e}')
                 await self.send(text_data=json.dumps({'error': 'Error al procesar la imagen.'}))
