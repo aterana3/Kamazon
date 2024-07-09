@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let products = {};
     let last_product_id = null;
     let locked = false;
-    let global_total = 0;
-    let global_subtotal = 0;
 
     startWebSocket();
     startCamera();
@@ -85,8 +83,20 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (Object.keys(data).length === 0) {
                 console.log("El diccionario está vacío, no se realizó ninguna acción.");
             } else {
+                const receivedProductIds = new Set(Object.keys(data));
+
+                Object.keys(products).forEach(function (product_id) {
+                    if (!receivedProductIds.has(product_id)) {
+                        delete products[product_id];
+                    }
+                });
+
                 Object.keys(data).forEach(function (product_id) {
-                    products[product_id] = data[product_id];
+                    if (products.hasOwnProperty(product_id)) {
+                        products[product_id].amount = data[product_id].amount;
+                    } else {
+                        products[product_id] = data[product_id];
+                    }
                 });
             }
             if (Object.keys(products).length > 0) {
@@ -94,20 +104,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 const last_key = keys[keys.length - 1];
                 addDetailProduct(last_key);
 
+                let subtotal = 0;
+                let total = 0;
+
                 for (const key in products) {
                     const product = products[key];
                     const amount = parseInt(product.amount);
                     const price = parseFloat(product.price);
-
-                    const subtotal = price * amount;
                     const tax = subtotal * 0.15;
-                    const total = subtotal + tax;
 
-                    global_subtotal += subtotal;
-                    global_total += total;
+                    subtotal += price * amount;
+                    total += subtotal + tax;
                 }
-                subtotalElement.textContent = global_subtotal;
-                totalElement.textContent = global_total;
+                subtotalElement.textContent = subtotal.toFixed(2);
+                totalElement.textContent = total.toFixed(2);
             }
             locked = false;
         };
