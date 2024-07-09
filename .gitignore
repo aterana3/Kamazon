@@ -68,3 +68,8 @@ Pipfile.lock
 # Environments
 .env
 .env.*
+
+# Ignore all log files
+dataset/*
+temp/*
+runs/*
