@@ -30,5 +30,6 @@ urlpatterns = [
     path('settings/', include('apps.settings.urls')),
     path('products/', include('apps.products.urls')),
     path('shopping-cart/', include('apps.shopping_cart.urls')),
+    path('billing/', include('apps.billing.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls'), name='ck_editor_5_upload_file'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

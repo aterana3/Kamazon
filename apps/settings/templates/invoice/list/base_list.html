@@ -11,15 +11,14 @@
 {% endblock header %}
 
 {% block rows %}
-    {% for item in invoice.items %}
+    {% for item in invoices %}
         <tr>
             <td class="px-4 py-2 text-right">{{ item.date }}</td>
-            <td class="px-4 py-2 text-right">${{ item.price|floatformat:2 }}</td>
             <td class="px-4 py-2 text-right">${{ item.tax|floatformat:2 }}</td>
             <td class="px-4 py-2 text-right">${{ item.subtotal|floatformat:2 }}</td>
             <td class="px-4 py-2 text-right">${{ item.total|floatformat:2 }}</td>
             <td class="px-4 py-2 text-right">
-                <a href="{% url 'products:invoice_update' item.id %}" class="text-primary">Edit</a>
+                <a href="{% url 'settings:invoice_detail' item.id %}" class="text-primary">View</a>
             </td>
         </tr>
     {% empty %}

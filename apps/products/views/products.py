@@ -1,5 +1,7 @@
 from django.views.generic import DetailView, ListView
 from apps.products.models import Product, Category
+from django.http import JsonResponse
+from django.views import View
 
 class ProductDetailView(DetailView):
     model = Product
@@ -20,3 +22,15 @@ class ProductListView(ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         return context
+
+
+class ProductDetailFetchView(View):
+    def get(self, request, *args, **kwargs):
+        product = Product.objects.get(pk=kwargs['pk'])
+        data = {
+            'name': product.name,
+            'price': product.price,
+            'stock': product.stock,
+            'image': product.get_image(),
+        }
+        return JsonResponse(data)

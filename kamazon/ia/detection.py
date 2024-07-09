@@ -4,11 +4,15 @@ import numpy as np
 from ultralytics import YOLO
 from django.conf import settings
 import json
+from apps.products.models import Product
+from asgiref.sync import sync_to_async
+
 
 def is_dark_image(image, threshold=20):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     brightness = np.mean(gray_image)
     return brightness < threshold
+
 
 def load_model():
     models_dir = settings.MODELS_ROOT
@@ -18,6 +22,7 @@ def load_model():
         return None
     model = YOLO(model_path)
     return model
+
 
 def get_product_id(class_index):
     class_index_file = 'class_index.json'
@@ -33,6 +38,7 @@ def get_product_id(class_index):
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON file: {class_index_file}: {e}")
         return None
+
 
 def detect_products(image):
     model = load_model()

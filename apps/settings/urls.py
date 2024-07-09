@@ -18,5 +18,5 @@ urlpatterns = [
     path('products/<int:pk>/delete/', product.ProductDeleteView.as_view(), name='product_delete'),
 
     path('invoices/', invoice.InvoiceListView.as_view(), name='invoices'),
-    path('invoices/<int:pk>/update/', invoice.InvoiceUpdateView.as_view(), name='invoice_update'),
+    path('invoices/<int:pk>/detail/', invoice.InvoiceDetailView.as_view(), name='invoice_detail'),
 ]

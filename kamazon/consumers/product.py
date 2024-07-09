@@ -7,7 +7,8 @@ import numpy as np
 from django.conf import settings
 import uuid
 from kamazon.ia.detection import is_dark_image, detect_products
-
+from apps.products.models import Product
+from asgiref.sync import sync_to_async
 
 class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
@@ -132,11 +133,19 @@ class ProductDetectorConsumer(AsyncWebsocketConsumer):
                 image_bytes = bytes_data
                 image = PILImage.open(BytesIO(image_bytes))
                 image = np.array(image)
-
                 if is_dark_image(image):
                     await self.send(text_data=json.dumps({'error': 'La imagen es muy oscura.'}))
                     return
                 detections = detect_products(image)
+                if detections is None:
+                    await self.send(text_data=json.dumps({'error': 'Error al procesar la imagen.'}))
+                    return
+                for k, v in detections.items():
+                    product = await sync_to_async(Product.objects.get)(id=k)
+                    detections[k] = {
+                        'price': float(product.price),
+                        'amount': v
+                    }
                 await self.send(text_data=json.dumps(detections))
             except Exception as e:
                 print(f'Error al procesar la imagen: {e}')
