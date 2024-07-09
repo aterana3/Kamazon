@@ -1,0 +1,37 @@
+{% extends "authentication_layout.html" %}
+{% load static %}
+
+{% block layout %}
+    <main class="bg-primary">
+        <div class="flex justify-center items-center min-h-screen">
+            {{block.super}}
+            <div class="hidden md:flex ml-8 flex-col justify-center items-center">
+                <img id="qrcode" class="w-32 h-32 mb-4" alt="QR Code Login">
+                <h2 class="text-lg text-center text-white">Escanea el QR para iniciar sesión</h2>
+                <p class="text-sm text-center text-white max-w-sm">Escanea el código en un dispositivo conectado para iniciar sesión inmediatamente en este dispositivo.</p>
+            </div>
+        </div>
+    </main>
+    <script src="{% static 'libs/qrcode/qrcode.min.js' %}"></script>
+    <script>
+        //Initialize variables
+        const token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        const loginQR = "{% url 'authentication:qr_login' %}"
+        const redirectURL = "{% url 'home' %}"
+    </script>
+    <script>
+        QRCode.toDataURL(`${token}`, function (error, url) {
+            if (error) console.error(error);
+            document.getElementById("qrcode").src = url;
+        });
+    </script>
+    <script src="{% static 'js/authentication.js' %}"></script>
+{% endblock layout %}
+
+{% block content %}
+    {% include "login/base_form.html" %}
+{% endblock content %}
+
+{% block footer %}
+    <p>¿No tienes cuenta? <a href="{% url 'authentication:register' %}" class="text-primary">Regístrate</a></p>
+{% endblock footer %}

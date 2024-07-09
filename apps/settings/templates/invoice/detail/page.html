@@ -1,0 +1,44 @@
+{% extends 'base_index.html' %}
+
+{% block content %}
+    <main class="bg-base min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-4">
+                <a href="{% url 'settings:invoices' %}" class="text-primary">Back to list</a>
+            </div>
+            <div class="w-full bg-white shadow-md p-4">
+                <h1 class="text-2xl font-bold mb-4">Invoice Detail</h1>
+                <div class="flex flex-wrap mb-4">
+                    <div class="w-full md:w-1/2">
+                        <p><strong>Date:</strong> {{ invoice.date }}</p>
+                        <p><strong>Subtotal:</strong> ${{ invoice.subtotal|floatformat:2 }}</p>
+                        <p><strong>Tax:</strong> ${{ invoice.tax|floatformat:2 }}</p>
+                        <p><strong>Total:</strong> ${{ invoice.total|floatformat:2 }}</p>
+                    </div>
+                </div>
+                <div class="w-full overflow-x-auto">
+                    <table class="min-w-full bg-white border">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border-b">Product</th>
+                                <th class="py-2 px-4 border-b">Quantity</th>
+                                <th class="py-2 px-4 border-b">Price</th>
+                                <th class="py-2 px-4 border-b">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detail in details %}
+                                <tr>
+                                    <td class="text-center py-2 px-4 border-b">{{ detail.product.name }}</td>
+                                    <td class="text-center py-2 px-4 border-b">{{ detail.quantity }}</td>
+                                    <td class="text-center py-2 px-4 border-b">${{ detail.price|floatformat:2 }}</td>
+                                    <td class="text-center py-2 px-4 border-b">${{ detail.subtotal|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock content %}

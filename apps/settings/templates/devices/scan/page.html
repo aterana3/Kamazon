@@ -1,0 +1,69 @@
+{% extends "base_layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block layout %}
+<main class="bg-primary flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-4 text-center">Escanea el Código QR</h1>
+        <div id="interactive" class="relative h-64 bg-gray-200 rounded-lg overflow-hidden">
+            <div id="video" class="w-full h-full object-cover"></div>
+        </div>
+        <div class="mt-4 text-center">
+            <button class="bg-primary text-white px-4 py-2 rounded-lg">Cancelar</button>
+        </div>
+        <p id="error" class="mt-4 text-center text-red-500 text-sm">
+        </p>
+    </div>
+</main>
+<script src="{% static "assets/vendor/html5-qrcode/html5-qrcode.min.js" %}"></script>
+<script>
+    const user_id = "{{ user.id }}";
+</script>
+<script>
+    const html5QrCode = new Html5Qrcode('video');
+
+    function start() {
+        html5QrCode.start(
+            { facingMode: "environment" },
+            {
+                fps: 10,
+                qrbox: 250
+            },
+            qrCodeMessage => {
+                html5QrCode.stop();
+                sendAuthorization(qrCodeMessage);
+            },
+            errorMessage => {
+                console.error(errorMessage);
+            }
+        ) .catch(err => {
+            console.error(err);
+        });
+    }
+
+    start();
+
+    document.querySelector('button').addEventListener('click', () => {
+        html5QrCode.stop();
+        window.location.href = "{% url 'settings:devices' %}";
+    });
+
+    function sendAuthorization(token) {
+        const webSocket = new WebSocket(`ws://${window.location.host}/ws/qr/${token}/`);
+        webSocket.onopen = () => {
+            console.log('WebSocket is open now.');
+            webSocket.send(JSON.stringify({
+                'type': 'user_id',
+                'user_id': user_id
+            }));
+        }
+        webSocket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'authenticated') {
+                window.location.href = "{% url 'settings:devices' %}";
+            }
+        };
+    }
+</script>
+{% endblock layout %}

@@ -1,0 +1,39 @@
+{% extends "base_index.html" %}
+
+{% block content %}
+<main class="flex flex-col md:flex-row m-0 font-sans">
+    <!-- Categories sidebar -->
+    <aside class="sidebar bg-white w-full md:w-72 p-5 border-r border-gray-300">
+        <h2 class="text-xl font-bold mb-5">Categorías</h2>
+        <ul class="space-y-4">
+            {% for category in categories %}
+                <li class="flex items-center mb-3">
+                    <img src="{{ category.get_image }}" alt="{{ category.name }}" class="w-10 h-10 mr-3 rounded-full">
+                    <a href="{{ category.get_absolute_url }}" class="text-md text-gray-600 hover:text-blue-500">{{ category.name }}</a>
+                </li>
+            {% empty %}
+                <p class="text-gray-600">No hay categorías disponibles</p>
+            {% endfor %}
+        </ul>
+    </aside>
+
+    <!-- Product list -->
+    <div class="content ml-0 md:ml-72 p-5 flex-grow">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+            {% for product in products %}
+                <div class="border border-gray-300 rounded-lg p-5 text-center shadow-md transition-transform transform hover:-translate-y-1 hover:shadow-lg">
+                    <img class="w-full h-auto max-h-40 mb-3 object-contain" src="{{ product.get_image }}" alt="{{ product.name }}">
+                    <div class="text-left">
+                        <p class="text-lg font-bold text-green-500">{{ product.price }}</p>
+                        <p class="text-sm mt-1 mb-2">{{ product.name }}</p>
+                        <p class="text-xs text-yellow-400">★ 4.5</p>
+                        <a href="{% url 'products:product_detail' product.id %}" class="inline-block mt-2 py-2 px-3 text-xs text-white bg-blue-500 rounded-md hover:bg-blue-700">Ver detalle</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-gray-600">No hay productos disponibles</p>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+{% endblock %}
