@@ -68,3 +68,6 @@ Pipfile.lock
 # Environments
 .env
 .env.*
+
+# runs
+runs/*
