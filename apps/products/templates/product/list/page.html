@@ -6,10 +6,13 @@
     <aside class="sidebar bg-white w-full md:w-72 p-5 border-r border-gray-300">
         <h2 class="text-xl font-bold mb-5">Categorías</h2>
         <ul class="space-y-4">
+            <li class="flex items-center mb-3">
+                <a href="{% url 'products:products_list' %}" class="text-md text-gray-600 hover:text-primary-light {% if not selected_category %}font-bold{% endif %}">Todas las categorías</a>
+            </li>
             {% for category in categories %}
                 <li class="flex items-center mb-3">
                     <img src="{{ category.get_image }}" alt="{{ category.name }}" class="w-10 h-10 mr-3 rounded-full">
-                    <a href="{{ category.get_absolute_url }}" class="text-md text-gray-600 hover:text-blue-500">{{ category.name }}</a>
+                    <a href="{% url 'products:products_list' %}?category={{ category.id }}" class="text-md text-gray-600 hover:text-primary-light {% if selected_category == category.id|stringformat:'s' %}font-bold{% endif %}">{{ category.name }}</a>
                 </li>
             {% empty %}
                 <p class="text-gray-600">No hay categorías disponibles</p>
@@ -26,8 +29,8 @@
                     <div class="text-left">
                         <p class="text-lg font-bold text-green-500">{{ product.price }}</p>
                         <p class="text-sm mt-1 mb-2">{{ product.name }}</p>
-                        <p class="text-xs text-yellow-400">★ 4.5</p>
-                        <a href="{% url 'products:product_detail' product.id %}" class="inline-block mt-2 py-2 px-3 text-xs text-white bg-blue-500 rounded-md hover:bg-blue-700">Ver detalle</a>
+                        <p class="text-xs text-yellow-400">★ 5</p>
+                        <a href="{% url 'products:product_detail' product.id %}" class="inline-block mt-2 py-2 px-3 text-xs text-white bg-primary rounded-md hover:bg-primary-light">Ver detalle</a>
                     </div>
                 </div>
             {% empty %}

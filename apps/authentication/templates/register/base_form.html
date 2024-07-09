@@ -17,7 +17,8 @@
     <div class="mb-4">
         {% include "components/forms/field.html" with field=form.password2 %}
     </div>
-    <div class="flex justify-center">
+    <div class="flex justify-center gap-2">
         {% include "components/button.html" with type="submit" extra_classes="bg-black text-white w-full" button_text=submit_text %}
+        <a href="{% url 'home' %}" class="bg-gray-300 w-full text-black text-center px-4 py-2 rounded-md">Cancelar</a>
     </div>
 {%endblock controls%}
