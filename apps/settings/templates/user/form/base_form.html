@@ -1,0 +1,29 @@
+{% extends "components/forms/form_layout.html" %}
+
+{% block controls %}
+    <div class="mb-4 grid grid-cols-2 gap-4">
+        {% include "components/forms/field.html" with field=form.first_name %}
+        {% include "components/forms/field.html" with field=form.last_name %}
+        {% include "components/forms/field.html" with field=form.phone %}
+        {% include "components/forms/field.html" with field=form.direction %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.email %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.avatar %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.current_password %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.new_password %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.confirm_password %}
+    </div>
+    <div class="flex justify-center gap-2">
+        {% include "components/button.html" with extra_classes="bg-primary hover:bg-primary-light text-white" button_text=submit_text %}
+        <a href="{% url 'settings:profile' %}" class="bg-gray-300 w-full text-black text-center px-4 py-2 rounded-md">Cancel</a>
+    </div>
+{% endblock controls %}

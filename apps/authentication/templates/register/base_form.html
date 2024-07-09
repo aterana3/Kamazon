@@ -1,0 +1,23 @@
+{% extends "components/forms/form_layout.html" %}
+
+{% block controls %}
+    <div class="mb-4 grid grid-cols-2 gap-4">
+        {% include "components/forms/field.html" with field=form.first_name %}
+        {% include "components/forms/field.html" with field=form.last_name %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.username %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.email %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.password1 %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.password2 %}
+    </div>
+    <div class="flex justify-center">
+        {% include "components/button.html" with type="submit" extra_classes="bg-black text-white w-full" button_text=submit_text %}
+    </div>
+{%endblock controls%}

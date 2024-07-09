@@ -13,14 +13,13 @@
     <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/regular.min.css' %}">
     <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome/css/solid.min.css' %}">
     {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% endblock styles %}
-
-    {% block scripts %}
-    {% endblock scripts %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     {% block layout %}
     {% endblock layout %}
+    {% block scripts %}
+    {% endblock scripts %}
 </body>
 </html>

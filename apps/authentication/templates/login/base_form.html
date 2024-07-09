@@ -1,0 +1,16 @@
+{% extends "components/forms/form_layout.html" %}
+
+{% block controls %}
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.username  %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.password %}
+    </div>
+    <div class="mb-4">
+        {% include "components/forms/field.html" with field=form.remember_me %}
+    </div>
+    <div class="flex justify-center">
+        {% include "components/button.html" with type="submit" extra_classes="bg-black text-white w-full" button_text=submit_text %}
+    </div>
+{% endblock controls %}

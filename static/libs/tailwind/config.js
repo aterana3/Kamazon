@@ -7,7 +7,7 @@ tailwind.config = {
             light: '#007E6D',
           },
           base: {
-            DEFAULT: '#fffcf8',
+            DEFAULT: '#fff9f2',
             alt: '#F3FFFC'
           },
         }

@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
@@ -12,8 +11,10 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['avatar', 'email', 'phone', 'direction']
+        fields = ['first_name', 'last_name', 'avatar', 'email', 'phone', 'direction']
         labels = {
+            'first_name': 'First name',
+            'last_name': 'Last name',
             'avatar': 'Avatar',
             'email': 'Email',
             'phone': 'Phone',
