@@ -38,14 +38,19 @@
 
                         <!-- Total -->
                         <div class="border-t pt-2 mt-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-bold">Subtotal <span id="cart-subtotal" class="text-lg font-bold">$0 usd</span></span>
-                                <span class="text-lg font-bold">Total <span id="cart-total" class="text-lg font-bold">$0 usd</span></span>
+                            <div class="mb-2">
+                                <p class="text-lg font-bold">Subtotal <span id="cart-subtotal" class="text-lg font-bold">$0 usd</span></p>
+                            </div>
+                            <div class="mb-2">
+                                <p class="text-lg font-bold">Total <span id="cart-total" class="text-lg font-bold">$0 usd</span></p>
                             </div>
                         </div>
                         <div class="border-t pt-2 mt-4">
                             {% csrf_token %}
-                            <button id="btn-checkout" class="w-full bg-primary-light text-white font-bold py-2 rounded-md">Checkout</button>
+                            <div class="flex justify-center gap-2">
+                                {% include 'components/button.html' with id="btn-checkout" extra_classes="bg-primary-light text-white" button_text="Checkout"%}
+                                <a href="{% url 'home' %}" class="bg-gray-300 w-full text-black text-center px-4 py-2 rounded-md">Cancelar</a>
+                            </div>
                         </div>
                     </div>
                 </div>
