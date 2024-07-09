@@ -56,13 +56,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     document.addEventListener('keydown', function (event) {
                         if (!capture_dialog.open) return;
-                        if (event.key === "c") {
+                        if (event.key === "t" || event.key === "v") {
                             if (!isSettingROI) {
                                 isSettingROI = true;
                                 pauseVideo();
                             } else {
                                 isSettingROI = false;
-                                captureAndSendImage();
+                                captureAndSendImage(event.key);
                                 resumeVideo();
                             }
                         }
@@ -97,13 +97,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         video.play();
                     }
 
-                    function captureAndSendImage() {
+                    function captureAndSendImage(key) {
                         context.drawImage(video, 0, 0, width, height);
 
                         let imgURL = canvas.toDataURL('image/jpeg');
                         let blob = dataURLtoBlob(imgURL);
+                        let type = (key === "v") ? "val" : (key === "t") ? "train" : undefined;
 
-                        sendImage(blob, roiCoordinates);
+                        sendImage(blob, roiCoordinates, type);
                         imageCount++;
                     }
                 });
@@ -134,17 +135,17 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function sendImage(blob, roiCoordinates) {
+    function sendImage(blob, roiCoordinates, type) {
         if (webSocket && webSocket.readyState === WebSocket.OPEN) {
             const reader = new FileReader();
             reader.readAsArrayBuffer(blob);
             reader.onloadend = function () {
                 const imageBytes = new Uint8Array(reader.result);
                 const data = JSON.stringify({
-                    action: 'temp',
                     id_product: product_id,
                     image: Array.from(imageBytes),
-                    roi: roiCoordinates
+                    roi: roiCoordinates,
+                    type: type
                 });
                 webSocket.send(data);
             };
@@ -167,10 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     form.addEventListener('submit', function (event) {
-        if (webSocket && webSocket.readyState === WebSocket.CLOSED) {
-            startWebSocket();
-        }
-        webSocket.send(JSON.stringify({action: 'save', id_product: product_id}));
+        closeWebSocket();
     });
 
     window.addEventListener('unload', function () {

@@ -1,0 +1,6 @@
+train: E:\PyProjects\Kamazon\dataset\train
+val: E:\PyProjects\Kamazon\dataset\val
+test:
+nc: 1
+names:
+  0: pera

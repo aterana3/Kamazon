@@ -6,7 +6,8 @@ from io import BytesIO
 import numpy as np
 from django.conf import settings
 import uuid
-from kamazon.ia.detection import is_dark_image, detect_product
+from kamazon.ia.detection import is_dark_image, detect_products
+
 
 class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
@@ -36,56 +37,67 @@ class ProductTrainingConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
-
-        action = data.get('action')
-
-        if action == 'temp':
-            await self.save_temporary(data)
-        elif action == 'save':
-            await self.save(data)
-
-    async def save_temporary(self, data):
-        product_id = data.get('id_product')
-        image_data = data.get('image')
-        roiCoords = data.get('roi')
-        filename = str(uuid.uuid4()) + '.jpg'
-
-        img = PILImage.open(BytesIO(bytes(image_data)))
-        img = img.resize((settings.IMG_WIDTH, settings.IMG_HEIGHT))
-
-        # Save image
-        temp_dir = os.path.join(settings.TEMP_ROOT, str(product_id))
-        if not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
-
-        temp_file_path = os.path.join(temp_dir, filename)
-
-        img.save(temp_file_path, 'JPEG')
-
-        json_annotation_file = os.path.join(temp_dir, 'annotations.json')
-
-        await self.send(text_data=json.dumps({'message': f'Temporary image {filename} saved.'}))
+        await self.save(data)
 
     async def save(self, data):
         product_id = data.get('id_product')
-        dataset_dir = os.path.join(settings.DATASET_ROOT, str(product_id))
-        if not os.path.exists(dataset_dir):
-            os.makedirs(dataset_dir)
+        image_data = data.get('image')
+        roi_coordinates = data.get('roi')
+        filename = str(uuid.uuid4())
+        type = data.get('type')
 
-        temp_dir = os.path.join(settings.TEMP_ROOT, str(product_id))
-        temp_files = os.listdir(temp_dir)
+        img = PILImage.open(BytesIO(bytes(image_data)))
 
-        for filename in temp_files:
-            temp_file_path = os.path.join(temp_dir, filename)
-            with open(temp_file_path, 'rb') as f:
-                image_data = f.read()
+        width, height = img.size
 
-            file_path = os.path.join(dataset_dir, filename)
-            with open(file_path, 'wb') as f:
-                f.write(image_data)
+        # Save image
+        images = os.path.join(settings.DATASET_ROOT, f"{type}/images")
+        if not os.path.exists(images):
+            os.makedirs(images)
 
-            os.remove(temp_file_path)
-        await self.send(text_data=json.dumps({'message': 'Images saved successfully.'}))
+        file_img = os.path.join(images, filename + '.jpg')
+
+        img.save(file_img, 'JPEG')
+
+        # Calculate ROI in the required format
+        roi_x_center = (roi_coordinates['x'] + roi_coordinates['width'] / 2) / width
+        roi_y_center = (roi_coordinates['y'] + roi_coordinates['height'] / 2) / height
+        roi_width = abs(roi_coordinates['width'] / width)
+        roi_height = abs(roi_coordinates['height'] / height)
+
+        # Save ROI
+        labels = os.path.join(settings.DATASET_ROOT, f"{type}/labels")
+        if not os.path.exists(labels):
+            os.makedirs(labels)
+
+        file_txt = os.path.join(labels, filename + '.txt')
+
+        index_class = self.load_class_index()
+
+        if product_id not in index_class:
+            objet_id = len(index_class)
+            index_class[product_id] = objet_id
+            self.save_class_index(index_class)
+        else:
+            objet_id = index_class[product_id]
+
+        with open(file_txt, 'w') as f:
+            f.write(f'{objet_id} {roi_x_center:.6f} {roi_y_center:.6f} {roi_width:.6f} {roi_height:.6f}')
+
+    def load_class_index(self):
+        try:
+            with open('class_index.json', 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    def save_class_index(self, class_index):
+        try:
+            with open('class_index.json', 'w') as f:
+                json.dump(class_index, f)
+        except Exception as e:
+            print(f'Error al guardar el archivo: {e}')
+
 
 class ProductDetectorConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -120,19 +132,15 @@ class ProductDetectorConsumer(AsyncWebsocketConsumer):
                 image_bytes = bytes_data
                 image = PILImage.open(BytesIO(image_bytes))
                 image = np.array(image)
+
                 if is_dark_image(image):
                     await self.send(text_data=json.dumps({'error': 'La imagen es muy oscura.'}))
                     return
-                class_name, confidence = detect_product(image)
-                if class_name:
-                    await self.send(
-                        text_data=json.dumps({
-                            'class_name': class_name,
-                            'confidence': confidence
-                        })
-                    )
-                else:
-                    await self.send(text_data=json.dumps({'error': 'Producto no reconocido o confianza baja.'}))
+                annotations = detect_products(image)
+                if annotations is None:
+                    await self.send(text_data=json.dumps({'error': 'Error al procesar la imagen.'}))
+                    return
+                await self.send(text_data=json.dumps({'annotations': annotations}))
             except Exception as e:
                 print(f'Error al procesar la imagen: {e}')
                 await self.send(text_data=json.dumps({'error': 'Error al procesar la imagen.'}))

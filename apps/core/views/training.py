@@ -1,8 +1,8 @@
 from django.shortcuts import redirect
 from django.views import View
-from kamazon.ia.training import train_model
+from kamazon.ia.training import create_yaml_file, create_model
 
 class TrainingBuildView(View):
     def get(self, request, *args, **kwargs):
-        train_model()
+        create_model()
         return redirect('home')
