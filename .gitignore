@@ -72,4 +72,4 @@ Pipfile.lock
 # Training
 dataset/*
 temp/*
-
+runs/*
