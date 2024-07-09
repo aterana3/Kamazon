@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import device, user, product
+from .views import device, user, product, factura
 
 app_name = 'settings'
 
@@ -16,4 +16,7 @@ urlpatterns = [
     path('products/create/', product.ProductCreateView.as_view(), name='product_create'),
     path('products/<int:pk>/update/', product.ProductUpdateView.as_view(), name='product_update'),
     path('products/<int:pk>/delete/', product.ProductDeleteView.as_view(), name='product_delete'),
+
+    path('factura/', factura.FacturaListView.as_view(), name='factura'),
+    path('factura/<int:pk>/update/', factura.FacturaUpdateView.as_view(), name='factura_update'),
 ]

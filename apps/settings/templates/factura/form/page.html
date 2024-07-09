@@ -1,0 +1,56 @@
+{% extends 'base_index.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'libs/choices/choices.min.css' %}">
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <main class="bg-base min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-4">
+                <a href="{% url 'settings:factura' %}" class="text-primary hover:text-primary-dark">
+                    <i class="fas fa-arrow-left"></i> Back to invoices
+                </a>
+            </div>
+            {% include 'factura/form/base_form.html' %}
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+
+    <script src="{% static 'libs/choices/choices.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const invoiceNumberInput = document.getElementById('{{ form.invoice_number.id_for_label }}');
+            const clientNameInput = document.getElementById('{{ form.client_name.id_for_label }}');
+            const invoiceDateInput = document.getElementById('{{ form.invoice_date.id_for_label }}');
+            const dueDateInput = document.getElementById('{{ form.due_date.id_for_label }}');
+            const amountDueInput = document.getElementById('{{ form.amount_due.id_for_label }}');
+            const invoiceStatusSelect = document.getElementById('{{ form.invoice_status.id_for_label }}');
+            const paymentMethodSelect = document.getElementById('{{ form.payment_method.id_for_label }}');
+
+            const invoiceStatusChoices = new Choices(invoiceStatusSelect, {
+                removeItemButton: true,
+                searchEnabled: true,
+                searchChoices: true,
+                placeholder: true,
+                placeholderValue: 'Select a status',
+                noResultsText: 'No results found',
+                itemSelectText: 'Press to select',
+            });
+
+            const paymentMethodChoices = new Choices(paymentMethodSelect, {
+                removeItemButton: true,
+                searchEnabled: true,
+                searchChoices: true,
+                placeholder: true,
+                placeholderValue: 'Select a payment method',
+                noResultsText: 'No results found',
+                itemSelectText: 'Press to select',
+            });
+        });
+    </script>
+{% endblock %}

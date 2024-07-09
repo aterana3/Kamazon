@@ -1,0 +1,38 @@
+{% extends 'components/table_layout.html' %}
+
+{% block header %}
+    <tr class="bg-primary text-white">
+        <th class="px-4 py-2">Producto</th>
+        <th class="px-4 py-2 text-right">Cantidad</th>
+        <th class="px-4 py-2 text-right">Precio</th>
+        <th class="px-4 py-2 text-right">Impuesto</th>
+        <th class="px-4 py-2 text-right">Subtotal</th>
+        <th class="px-4 py-2 text-right">Total</th>
+    </tr>
+{% endblock header %}
+
+{% block rows %}
+    {% for item in invoice.items %}
+        <tr>
+            <td class="px-4 py-2">{{ item.name }}</td>
+            <td class="px-4 py-2 text-right">{{ item.quantity }}</td>
+            <td class="px-4 py-2 text-right">${{ item.price|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">${{ item.tax|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">${{ item.quantity|mul:item.price|floatformat:2 }}</td>
+            <td class="px-4 py-2 text-right">${{ item.quantity|mul:item.price|add:item.tax|floatformat:2 }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td class="px-4 py-2" colspan="6">No items found</td>
+        </tr>
+    {% endfor %}
+{% endblock rows %}
+
+{% block footer %}
+    <tr class="bg-primary text-white">
+        <th class="px-4 py-2" colspan="4" class="font-medium">Total:</th>
+        <th class="px-4 py-2 text-right font-medium">${{ invoice.items|sum:calculateSubtotal|floatformat:2 }}</th>
+        <th class="px-4 py-2 text-right font-medium">${{ invoice.items|sum:calculateTotal|floatformat:2 }}</th>
+    </tr>
+{% endblock footer %}
+
